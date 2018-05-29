@@ -24,7 +24,7 @@ import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 // import "github.com/mwitkow/go-proto-validators/validator.proto";
 
 // Specifies path for generated file (relative to $GOPATH) and the name of the package.
-option go_package = "github.com/jaegertracing/jaeger/model/proto;protomodel";
+option go_package = "github.com/jaegertracing/jaeger/model;model";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
   info: {
@@ -55,16 +55,16 @@ message TraceID {
 
 // For comparison of how KeyValue looks when using `oneof`.
 // Both definitions result in the same message size.
-message KeyValue2 {
-  string key = 1;
-  oneof value {
-    string vStr = 2;
-    double  vDouble = 3;
-    bool vBool = 4;
-    int64 vLong = 5;
-    bytes vBinary = 6;
-  }
-}
+// message KeyValue2 {
+//   string key = 1;
+//   oneof value {
+//     string vStr = 2;
+//     double  vDouble = 3;
+//     bool vBool = 4;
+//     int64 vLong = 5;
+//     bytes vBinary = 6;
+//   }
+// }
 
 enum ValueType {
   STRING = 0;
@@ -75,12 +75,15 @@ enum ValueType {
 };
 
 message KeyValue {
+  option (gogoproto.equal) = true;
+  option (gogoproto.compare) = true;
+
   string    key     = 1;
   ValueType vType   = 2;
   string    vStr    = 3;
   double    vDouble = 4;
   bool      vBool   = 5;
-  uint64    vLong   = 6;
+  int64     vLong   = 6;
   bytes     vBinary = 7;
 }
 
@@ -107,7 +110,7 @@ message SpanRef {
     (gogoproto.nullable) = false,
     (gogoproto.customtype) = "SpanID"
   ];
-  SpanRefType type = 3;
+  SpanRefType refType = 3;
 }
 
 message Process {
@@ -129,7 +132,10 @@ message Span {
   repeated SpanRef references = 4 [
     (gogoproto.nullable) = false
   ];
-  uint32 flags = 5;
+  uint32 flags = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "Flags"
+  ];
   google.protobuf.Timestamp startTime = 6 [
     (gogoproto.stdtime) = true,
     (gogoproto.nullable) = false
@@ -149,19 +155,32 @@ message Span {
   repeated string warnings = 12;
 }
 
+message Span2 {
+    TraceID traceID = 1 [
+      (gogoproto.nullable) = false
+    ];
+    uint64 spanID = 2 [
+      (gogoproto.nullable) = false,
+      (gogoproto.customtype) = "SpanID"
+    ];
+}
+
 message Trace {
-  repeated Span spans = 1 [
+  message ProcessMapping {
+      string processID = 1;
+      Process process = 2 [
+        (gogoproto.nullable) = false
+      ];
+  }
+  repeated Span spans = 1;
+  repeated ProcessMapping processMap = 2 [
     (gogoproto.nullable) = false
   ];
-  map<string, Process> processMap = 2 [
-    (gogoproto.nullable) = false
-  ];
+  repeated string warnings = 3;
 }
 
 message Batch {
-    repeated Span spans = 1 [
-      (gogoproto.nullable) = false
-    ];
+    repeated Span spans = 1;
     Process process = 2 [
       (gogoproto.nullable) = false
     ];

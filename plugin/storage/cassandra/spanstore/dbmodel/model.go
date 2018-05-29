@@ -28,7 +28,7 @@ type TraceID [16]byte
 type Span struct {
 	TraceID       TraceID
 	SpanID        int64
-	ParentID      int64
+	ParentID      int64 // deprecated
 	OperationName string
 	Flags         int32
 	StartTime     int64
@@ -106,5 +106,5 @@ func (dbTraceID TraceID) ToDomain() model.TraceID {
 
 // String returns hex string representation of the trace ID.
 func (dbTraceID TraceID) String() string {
-	return dbTraceID.ToDomain().String()
+	return dbTraceID.ToDomain().AsString()
 }

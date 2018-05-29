@@ -1,5 +1,5 @@
 {
-  "Spans": [
+  "spans": [
     {
       "traceID": "1",
       "spanID": "2",
@@ -72,7 +72,7 @@
       "spanID": "3",
       "references": [
           {
-              "refType": "child-of",
+              "refType": "CHILD_OF",
               "traceID": "1",
               "spanID": "2"
           }
@@ -90,17 +90,17 @@
       "operationName": "reference-test",
       "references": [
           {
-              "refType": "child-of",
+              "refType": "CHILD_OF",
               "traceID": "ff",
               "spanID": "ff"
           },
           {
-              "refType": "child-of",
+              "refType": "CHILD_OF",
               "traceID": "1",
               "spanID": "2"
           },
           {
-              "refType": "follows-from",
+              "refType": "FOLLOWS_FROM",
               "traceID": "1",
               "spanID": "2"
           }
@@ -120,7 +120,7 @@
       "operationName": "preserveParentID-test",
       "references": [
         {
-          "refType": "child-of",
+          "refType": "CHILD_OF",
           "traceID": "1",
           "spanID": "4"
         }
@@ -135,6 +135,7 @@
       ]
     }
   ],
+  "processMap": {},
   "warnings": [
     "some trace warning"
   ]

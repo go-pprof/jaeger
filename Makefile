@@ -338,4 +338,4 @@ $$GOPATH/src/ \
 		model/proto/jaeger.proto
 
 	# Workaround for https://github.com/grpc-ecosystem/grpc-gateway/issues/229.
-	sed -i '' "s/empty.Empty/types.Empty/g" model/proto/jaeger.pb.gw.go
+	sed -i '' "s/empty.Empty/types.Empty/g" model/jaeger.pb.gw.go

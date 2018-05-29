@@ -2,25 +2,24 @@
 // source: jaeger.proto
 
 /*
-	Package protomodel is a generated protocol buffer package.
+	Package model is a generated protocol buffer package.
 
 	It is generated from these files:
 		jaeger.proto
 
 	It has these top-level messages:
 		TraceID
-		SpanID
-		KeyValue2
 		KeyValue
 		Log
 		SpanRef
 		Process
 		Span
+		Span2
 		Trace
 		Batch
 		GetTraceID
 */
-package protomodel
+package model
 
 import proto "github.com/gogo/protobuf/proto"
 import golang_proto "github.com/golang/protobuf/proto"
@@ -34,6 +33,8 @@ import _ "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger/options"
 import _ "github.com/gogo/protobuf/gogoproto"
 
 import time "time"
+
+import bytes "bytes"
 
 import context "golang.org/x/net/context"
 import grpc "google.golang.org/grpc"
@@ -131,243 +132,20 @@ func (m *TraceID) GetHigh() uint64 {
 	return 0
 }
 
-type SpanID struct {
-	Value uint64 `protobuf:"varint,1,opt,name=Value,proto3" json:"Value,omitempty"`
-}
-
-func (m *SpanID) Reset()                    { *m = SpanID{} }
-func (m *SpanID) String() string            { return proto.CompactTextString(m) }
-func (*SpanID) ProtoMessage()               {}
-func (*SpanID) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{1} }
-
-func (m *SpanID) GetValue() uint64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
-}
-
-// For comparison of how KeyValue looks when using `oneof`.
-// Both definitions result in the same message size.
-type KeyValue2 struct {
-	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	// Types that are valid to be assigned to Value:
-	//	*KeyValue2_VStr
-	//	*KeyValue2_VDouble
-	//	*KeyValue2_VBool
-	//	*KeyValue2_VLong
-	//	*KeyValue2_VBinary
-	Value isKeyValue2_Value `protobuf_oneof:"value"`
-}
-
-func (m *KeyValue2) Reset()                    { *m = KeyValue2{} }
-func (m *KeyValue2) String() string            { return proto.CompactTextString(m) }
-func (*KeyValue2) ProtoMessage()               {}
-func (*KeyValue2) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{2} }
-
-type isKeyValue2_Value interface {
-	isKeyValue2_Value()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type KeyValue2_VStr struct {
-	VStr string `protobuf:"bytes,2,opt,name=vStr,proto3,oneof"`
-}
-type KeyValue2_VDouble struct {
-	VDouble float64 `protobuf:"fixed64,3,opt,name=vDouble,proto3,oneof"`
-}
-type KeyValue2_VBool struct {
-	VBool bool `protobuf:"varint,4,opt,name=vBool,proto3,oneof"`
-}
-type KeyValue2_VLong struct {
-	VLong int64 `protobuf:"varint,5,opt,name=vLong,proto3,oneof"`
-}
-type KeyValue2_VBinary struct {
-	VBinary []byte `protobuf:"bytes,6,opt,name=vBinary,proto3,oneof"`
-}
-
-func (*KeyValue2_VStr) isKeyValue2_Value()    {}
-func (*KeyValue2_VDouble) isKeyValue2_Value() {}
-func (*KeyValue2_VBool) isKeyValue2_Value()   {}
-func (*KeyValue2_VLong) isKeyValue2_Value()   {}
-func (*KeyValue2_VBinary) isKeyValue2_Value() {}
-
-func (m *KeyValue2) GetValue() isKeyValue2_Value {
-	if m != nil {
-		return m.Value
-	}
-	return nil
-}
-
-func (m *KeyValue2) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *KeyValue2) GetVStr() string {
-	if x, ok := m.GetValue().(*KeyValue2_VStr); ok {
-		return x.VStr
-	}
-	return ""
-}
-
-func (m *KeyValue2) GetVDouble() float64 {
-	if x, ok := m.GetValue().(*KeyValue2_VDouble); ok {
-		return x.VDouble
-	}
-	return 0
-}
-
-func (m *KeyValue2) GetVBool() bool {
-	if x, ok := m.GetValue().(*KeyValue2_VBool); ok {
-		return x.VBool
-	}
-	return false
-}
-
-func (m *KeyValue2) GetVLong() int64 {
-	if x, ok := m.GetValue().(*KeyValue2_VLong); ok {
-		return x.VLong
-	}
-	return 0
-}
-
-func (m *KeyValue2) GetVBinary() []byte {
-	if x, ok := m.GetValue().(*KeyValue2_VBinary); ok {
-		return x.VBinary
-	}
-	return nil
-}
-
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*KeyValue2) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _KeyValue2_OneofMarshaler, _KeyValue2_OneofUnmarshaler, _KeyValue2_OneofSizer, []interface{}{
-		(*KeyValue2_VStr)(nil),
-		(*KeyValue2_VDouble)(nil),
-		(*KeyValue2_VBool)(nil),
-		(*KeyValue2_VLong)(nil),
-		(*KeyValue2_VBinary)(nil),
-	}
-}
-
-func _KeyValue2_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*KeyValue2)
-	// value
-	switch x := m.Value.(type) {
-	case *KeyValue2_VStr:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		_ = b.EncodeStringBytes(x.VStr)
-	case *KeyValue2_VDouble:
-		_ = b.EncodeVarint(3<<3 | proto.WireFixed64)
-		_ = b.EncodeFixed64(math.Float64bits(x.VDouble))
-	case *KeyValue2_VBool:
-		t := uint64(0)
-		if x.VBool {
-			t = 1
-		}
-		_ = b.EncodeVarint(4<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(t)
-	case *KeyValue2_VLong:
-		_ = b.EncodeVarint(5<<3 | proto.WireVarint)
-		_ = b.EncodeVarint(uint64(x.VLong))
-	case *KeyValue2_VBinary:
-		_ = b.EncodeVarint(6<<3 | proto.WireBytes)
-		_ = b.EncodeRawBytes(x.VBinary)
-	case nil:
-	default:
-		return fmt.Errorf("KeyValue2.Value has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _KeyValue2_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*KeyValue2)
-	switch tag {
-	case 2: // value.vStr
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.Value = &KeyValue2_VStr{x}
-		return true, err
-	case 3: // value.vDouble
-		if wire != proto.WireFixed64 {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeFixed64()
-		m.Value = &KeyValue2_VDouble{math.Float64frombits(x)}
-		return true, err
-	case 4: // value.vBool
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.Value = &KeyValue2_VBool{x != 0}
-		return true, err
-	case 5: // value.vLong
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.Value = &KeyValue2_VLong{int64(x)}
-		return true, err
-	case 6: // value.vBinary
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeRawBytes(true)
-		m.Value = &KeyValue2_VBinary{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _KeyValue2_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*KeyValue2)
-	// value
-	switch x := m.Value.(type) {
-	case *KeyValue2_VStr:
-		n += proto.SizeVarint(2<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.VStr)))
-		n += len(x.VStr)
-	case *KeyValue2_VDouble:
-		n += proto.SizeVarint(3<<3 | proto.WireFixed64)
-		n += 8
-	case *KeyValue2_VBool:
-		n += proto.SizeVarint(4<<3 | proto.WireVarint)
-		n += 1
-	case *KeyValue2_VLong:
-		n += proto.SizeVarint(5<<3 | proto.WireVarint)
-		n += proto.SizeVarint(uint64(x.VLong))
-	case *KeyValue2_VBinary:
-		n += proto.SizeVarint(6<<3 | proto.WireBytes)
-		n += proto.SizeVarint(uint64(len(x.VBinary)))
-		n += len(x.VBinary)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 type KeyValue struct {
 	Key     string    `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	VType   ValueType `protobuf:"varint,2,opt,name=vType,proto3,enum=jaeger.ValueType" json:"vType,omitempty"`
 	VStr    string    `protobuf:"bytes,3,opt,name=vStr,proto3" json:"vStr,omitempty"`
 	VDouble float64   `protobuf:"fixed64,4,opt,name=vDouble,proto3" json:"vDouble,omitempty"`
 	VBool   bool      `protobuf:"varint,5,opt,name=vBool,proto3" json:"vBool,omitempty"`
-	VLong   uint64    `protobuf:"varint,6,opt,name=vLong,proto3" json:"vLong,omitempty"`
+	VLong   int64     `protobuf:"varint,6,opt,name=vLong,proto3" json:"vLong,omitempty"`
 	VBinary []byte    `protobuf:"bytes,7,opt,name=vBinary,proto3" json:"vBinary,omitempty"`
 }
 
 func (m *KeyValue) Reset()                    { *m = KeyValue{} }
 func (m *KeyValue) String() string            { return proto.CompactTextString(m) }
 func (*KeyValue) ProtoMessage()               {}
-func (*KeyValue) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{3} }
+func (*KeyValue) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{1} }
 
 func (m *KeyValue) GetKey() string {
 	if m != nil {
@@ -404,7 +182,7 @@ func (m *KeyValue) GetVBool() bool {
 	return false
 }
 
-func (m *KeyValue) GetVLong() uint64 {
+func (m *KeyValue) GetVLong() int64 {
 	if m != nil {
 		return m.VLong
 	}
@@ -426,7 +204,7 @@ type Log struct {
 func (m *Log) Reset()                    { *m = Log{} }
 func (m *Log) String() string            { return proto.CompactTextString(m) }
 func (*Log) ProtoMessage()               {}
-func (*Log) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{4} }
+func (*Log) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{2} }
 
 func (m *Log) GetTimestamp() time.Time {
 	if m != nil {
@@ -444,14 +222,14 @@ func (m *Log) GetFields() []KeyValue {
 
 type SpanRef struct {
 	TraceID TraceID     `protobuf:"bytes,1,opt,name=traceID" json:"traceID"`
-	SpanID  SpanID      `protobuf:"bytes,2,opt,name=spanID" json:"spanID"`
-	Type    SpanRefType `protobuf:"varint,3,opt,name=type,proto3,enum=jaeger.SpanRefType" json:"type,omitempty"`
+	SpanID  SpanID      `protobuf:"varint,2,opt,name=spanID,proto3,customtype=SpanID" json:"spanID"`
+	RefType SpanRefType `protobuf:"varint,3,opt,name=refType,proto3,enum=jaeger.SpanRefType" json:"refType,omitempty"`
 }
 
 func (m *SpanRef) Reset()                    { *m = SpanRef{} }
 func (m *SpanRef) String() string            { return proto.CompactTextString(m) }
 func (*SpanRef) ProtoMessage()               {}
-func (*SpanRef) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{5} }
+func (*SpanRef) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{3} }
 
 func (m *SpanRef) GetTraceID() TraceID {
 	if m != nil {
@@ -460,16 +238,9 @@ func (m *SpanRef) GetTraceID() TraceID {
 	return TraceID{}
 }
 
-func (m *SpanRef) GetSpanID() SpanID {
+func (m *SpanRef) GetRefType() SpanRefType {
 	if m != nil {
-		return m.SpanID
-	}
-	return SpanID{}
-}
-
-func (m *SpanRef) GetType() SpanRefType {
-	if m != nil {
-		return m.Type
+		return m.RefType
 	}
 	return SpanRefType_CHILD_OF
 }
@@ -482,7 +253,7 @@ type Process struct {
 func (m *Process) Reset()                    { *m = Process{} }
 func (m *Process) String() string            { return proto.CompactTextString(m) }
 func (*Process) ProtoMessage()               {}
-func (*Process) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{6} }
+func (*Process) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{4} }
 
 func (m *Process) GetServiceName() string {
 	if m != nil {
@@ -500,10 +271,10 @@ func (m *Process) GetTags() []KeyValue {
 
 type Span struct {
 	TraceID       TraceID       `protobuf:"bytes,1,opt,name=traceID" json:"traceID"`
-	SpanID        SpanID        `protobuf:"bytes,2,opt,name=spanID" json:"spanID"`
+	SpanID        SpanID        `protobuf:"varint,2,opt,name=spanID,proto3,customtype=SpanID" json:"spanID"`
 	OperationName string        `protobuf:"bytes,3,opt,name=operation_name,json=operationName,proto3" json:"operation_name,omitempty"`
 	References    []SpanRef     `protobuf:"bytes,4,rep,name=references" json:"references"`
-	Flags         uint32        `protobuf:"varint,5,opt,name=flags,proto3" json:"flags,omitempty"`
+	Flags         Flags         `protobuf:"varint,5,opt,name=flags,proto3,customtype=Flags" json:"flags"`
 	StartTime     time.Time     `protobuf:"bytes,6,opt,name=startTime,stdtime" json:"startTime"`
 	Duration      time.Duration `protobuf:"bytes,7,opt,name=duration,stdduration" json:"duration"`
 	Tags          []KeyValue    `protobuf:"bytes,8,rep,name=tags" json:"tags"`
@@ -516,20 +287,13 @@ type Span struct {
 func (m *Span) Reset()                    { *m = Span{} }
 func (m *Span) String() string            { return proto.CompactTextString(m) }
 func (*Span) ProtoMessage()               {}
-func (*Span) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{7} }
+func (*Span) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{5} }
 
 func (m *Span) GetTraceID() TraceID {
 	if m != nil {
 		return m.TraceID
 	}
 	return TraceID{}
-}
-
-func (m *Span) GetSpanID() SpanID {
-	if m != nil {
-		return m.SpanID
-	}
-	return SpanID{}
 }
 
 func (m *Span) GetOperationName() string {
@@ -544,13 +308,6 @@ func (m *Span) GetReferences() []SpanRef {
 		return m.References
 	}
 	return nil
-}
-
-func (m *Span) GetFlags() uint32 {
-	if m != nil {
-		return m.Flags
-	}
-	return 0
 }
 
 func (m *Span) GetStartTime() time.Time {
@@ -602,41 +359,90 @@ func (m *Span) GetWarnings() []string {
 	return nil
 }
 
+type Span2 struct {
+	TraceID TraceID `protobuf:"bytes,1,opt,name=traceID" json:"traceID"`
+	SpanID  SpanID  `protobuf:"varint,2,opt,name=spanID,proto3,customtype=SpanID" json:"spanID"`
+}
+
+func (m *Span2) Reset()                    { *m = Span2{} }
+func (m *Span2) String() string            { return proto.CompactTextString(m) }
+func (*Span2) ProtoMessage()               {}
+func (*Span2) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{6} }
+
+func (m *Span2) GetTraceID() TraceID {
+	if m != nil {
+		return m.TraceID
+	}
+	return TraceID{}
+}
+
 type Trace struct {
-	Spans      []Span             `protobuf:"bytes,1,rep,name=spans" json:"spans"`
-	ProcessMap map[string]Process `protobuf:"bytes,2,rep,name=processMap" json:"processMap" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	Spans      []*Span                `protobuf:"bytes,1,rep,name=spans" json:"spans,omitempty"`
+	ProcessMap []Trace_ProcessMapping `protobuf:"bytes,2,rep,name=processMap" json:"processMap"`
+	Warnings   []string               `protobuf:"bytes,3,rep,name=warnings" json:"warnings,omitempty"`
 }
 
 func (m *Trace) Reset()                    { *m = Trace{} }
 func (m *Trace) String() string            { return proto.CompactTextString(m) }
 func (*Trace) ProtoMessage()               {}
-func (*Trace) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{8} }
+func (*Trace) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{7} }
 
-func (m *Trace) GetSpans() []Span {
+func (m *Trace) GetSpans() []*Span {
 	if m != nil {
 		return m.Spans
 	}
 	return nil
 }
 
-func (m *Trace) GetProcessMap() map[string]Process {
+func (m *Trace) GetProcessMap() []Trace_ProcessMapping {
 	if m != nil {
 		return m.ProcessMap
 	}
 	return nil
 }
 
+func (m *Trace) GetWarnings() []string {
+	if m != nil {
+		return m.Warnings
+	}
+	return nil
+}
+
+type Trace_ProcessMapping struct {
+	ProcessID string  `protobuf:"bytes,1,opt,name=processID,proto3" json:"processID,omitempty"`
+	Process   Process `protobuf:"bytes,2,opt,name=process" json:"process"`
+}
+
+func (m *Trace_ProcessMapping) Reset()                    { *m = Trace_ProcessMapping{} }
+func (m *Trace_ProcessMapping) String() string            { return proto.CompactTextString(m) }
+func (*Trace_ProcessMapping) ProtoMessage()               {}
+func (*Trace_ProcessMapping) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{7, 0} }
+
+func (m *Trace_ProcessMapping) GetProcessID() string {
+	if m != nil {
+		return m.ProcessID
+	}
+	return ""
+}
+
+func (m *Trace_ProcessMapping) GetProcess() Process {
+	if m != nil {
+		return m.Process
+	}
+	return Process{}
+}
+
 type Batch struct {
-	Spans   []Span  `protobuf:"bytes,1,rep,name=spans" json:"spans"`
+	Spans   []*Span `protobuf:"bytes,1,rep,name=spans" json:"spans,omitempty"`
 	Process Process `protobuf:"bytes,2,opt,name=process" json:"process"`
 }
 
 func (m *Batch) Reset()                    { *m = Batch{} }
 func (m *Batch) String() string            { return proto.CompactTextString(m) }
 func (*Batch) ProtoMessage()               {}
-func (*Batch) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{9} }
+func (*Batch) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{8} }
 
-func (m *Batch) GetSpans() []Span {
+func (m *Batch) GetSpans() []*Span {
 	if m != nil {
 		return m.Spans
 	}
@@ -657,7 +463,7 @@ type GetTraceID struct {
 func (m *GetTraceID) Reset()                    { *m = GetTraceID{} }
 func (m *GetTraceID) String() string            { return proto.CompactTextString(m) }
 func (*GetTraceID) ProtoMessage()               {}
-func (*GetTraceID) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{10} }
+func (*GetTraceID) Descriptor() ([]byte, []int) { return fileDescriptorJaeger, []int{9} }
 
 func (m *GetTraceID) GetId() string {
 	if m != nil {
@@ -669,10 +475,6 @@ func (m *GetTraceID) GetId() string {
 func init() {
 	proto.RegisterType((*TraceID)(nil), "jaeger.TraceID")
 	golang_proto.RegisterType((*TraceID)(nil), "jaeger.TraceID")
-	proto.RegisterType((*SpanID)(nil), "jaeger.SpanID")
-	golang_proto.RegisterType((*SpanID)(nil), "jaeger.SpanID")
-	proto.RegisterType((*KeyValue2)(nil), "jaeger.KeyValue2")
-	golang_proto.RegisterType((*KeyValue2)(nil), "jaeger.KeyValue2")
 	proto.RegisterType((*KeyValue)(nil), "jaeger.KeyValue")
 	golang_proto.RegisterType((*KeyValue)(nil), "jaeger.KeyValue")
 	proto.RegisterType((*Log)(nil), "jaeger.Log")
@@ -683,8 +485,12 @@ func init() {
 	golang_proto.RegisterType((*Process)(nil), "jaeger.Process")
 	proto.RegisterType((*Span)(nil), "jaeger.Span")
 	golang_proto.RegisterType((*Span)(nil), "jaeger.Span")
+	proto.RegisterType((*Span2)(nil), "jaeger.Span2")
+	golang_proto.RegisterType((*Span2)(nil), "jaeger.Span2")
 	proto.RegisterType((*Trace)(nil), "jaeger.Trace")
 	golang_proto.RegisterType((*Trace)(nil), "jaeger.Trace")
+	proto.RegisterType((*Trace_ProcessMapping)(nil), "jaeger.Trace.ProcessMapping")
+	golang_proto.RegisterType((*Trace_ProcessMapping)(nil), "jaeger.Trace.ProcessMapping")
 	proto.RegisterType((*Batch)(nil), "jaeger.Batch")
 	golang_proto.RegisterType((*Batch)(nil), "jaeger.Batch")
 	proto.RegisterType((*GetTraceID)(nil), "jaeger.GetTraceID")
@@ -693,6 +499,114 @@ func init() {
 	golang_proto.RegisterEnum("jaeger.ValueType", ValueType_name, ValueType_value)
 	proto.RegisterEnum("jaeger.SpanRefType", SpanRefType_name, SpanRefType_value)
 	golang_proto.RegisterEnum("jaeger.SpanRefType", SpanRefType_name, SpanRefType_value)
+}
+func (this *KeyValue) Compare(that interface{}) int {
+	if that == nil {
+		if this == nil {
+			return 0
+		}
+		return 1
+	}
+
+	that1, ok := that.(*KeyValue)
+	if !ok {
+		that2, ok := that.(KeyValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return 1
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return 0
+		}
+		return 1
+	} else if this == nil {
+		return -1
+	}
+	if this.Key != that1.Key {
+		if this.Key < that1.Key {
+			return -1
+		}
+		return 1
+	}
+	if this.VType != that1.VType {
+		if this.VType < that1.VType {
+			return -1
+		}
+		return 1
+	}
+	if this.VStr != that1.VStr {
+		if this.VStr < that1.VStr {
+			return -1
+		}
+		return 1
+	}
+	if this.VDouble != that1.VDouble {
+		if this.VDouble < that1.VDouble {
+			return -1
+		}
+		return 1
+	}
+	if this.VBool != that1.VBool {
+		if !this.VBool {
+			return -1
+		}
+		return 1
+	}
+	if this.VLong != that1.VLong {
+		if this.VLong < that1.VLong {
+			return -1
+		}
+		return 1
+	}
+	if c := bytes.Compare(this.VBinary, that1.VBinary); c != 0 {
+		return c
+	}
+	return 0
+}
+func (this *KeyValue) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*KeyValue)
+	if !ok {
+		that2, ok := that.(KeyValue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.Key != that1.Key {
+		return false
+	}
+	if this.VType != that1.VType {
+		return false
+	}
+	if this.VStr != that1.VStr {
+		return false
+	}
+	if this.VDouble != that1.VDouble {
+		return false
+	}
+	if this.VBool != that1.VBool {
+		return false
+	}
+	if this.VLong != that1.VLong {
+		return false
+	}
+	if !bytes.Equal(this.VBinary, that1.VBinary) {
+		return false
+	}
+	return true
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -859,105 +773,6 @@ func (m *TraceID) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *SpanID) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *SpanID) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Value != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintJaeger(dAtA, i, uint64(m.Value))
-	}
-	return i, nil
-}
-
-func (m *KeyValue2) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *KeyValue2) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Key) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintJaeger(dAtA, i, uint64(len(m.Key)))
-		i += copy(dAtA[i:], m.Key)
-	}
-	if m.Value != nil {
-		nn1, err := m.Value.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn1
-	}
-	return i, nil
-}
-
-func (m *KeyValue2_VStr) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJaeger(dAtA, i, uint64(len(m.VStr)))
-	i += copy(dAtA[i:], m.VStr)
-	return i, nil
-}
-func (m *KeyValue2_VDouble) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x19
-	i++
-	binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.VDouble))))
-	i += 8
-	return i, nil
-}
-func (m *KeyValue2_VBool) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x20
-	i++
-	if m.VBool {
-		dAtA[i] = 1
-	} else {
-		dAtA[i] = 0
-	}
-	i++
-	return i, nil
-}
-func (m *KeyValue2_VLong) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x28
-	i++
-	i = encodeVarintJaeger(dAtA, i, uint64(m.VLong))
-	return i, nil
-}
-func (m *KeyValue2_VBinary) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.VBinary != nil {
-		dAtA[i] = 0x32
-		i++
-		i = encodeVarintJaeger(dAtA, i, uint64(len(m.VBinary)))
-		i += copy(dAtA[i:], m.VBinary)
-	}
-	return i, nil
-}
 func (m *KeyValue) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1038,11 +853,11 @@ func (m *Log) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(types.SizeOfStdTime(m.Timestamp)))
-	n2, err := types.StdTimeMarshalTo(m.Timestamp, dAtA[i:])
+	n1, err := types.StdTimeMarshalTo(m.Timestamp, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n2
+	i += n1
 	if len(m.Fields) > 0 {
 		for _, msg := range m.Fields {
 			dAtA[i] = 0x12
@@ -1076,23 +891,20 @@ func (m *SpanRef) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(m.TraceID.Size()))
-	n3, err := m.TraceID.MarshalTo(dAtA[i:])
+	n2, err := m.TraceID.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n3
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJaeger(dAtA, i, uint64(m.SpanID.Size()))
-	n4, err := m.SpanID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	i += n2
+	if m.SpanID != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJaeger(dAtA, i, uint64(m.SpanID))
 	}
-	i += n4
-	if m.Type != 0 {
+	if m.RefType != 0 {
 		dAtA[i] = 0x18
 		i++
-		i = encodeVarintJaeger(dAtA, i, uint64(m.Type))
+		i = encodeVarintJaeger(dAtA, i, uint64(m.RefType))
 	}
 	return i, nil
 }
@@ -1151,19 +963,16 @@ func (m *Span) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0xa
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(m.TraceID.Size()))
-	n5, err := m.TraceID.MarshalTo(dAtA[i:])
+	n3, err := m.TraceID.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n5
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintJaeger(dAtA, i, uint64(m.SpanID.Size()))
-	n6, err := m.SpanID.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
+	i += n3
+	if m.SpanID != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJaeger(dAtA, i, uint64(m.SpanID))
 	}
-	i += n6
 	if len(m.OperationName) > 0 {
 		dAtA[i] = 0x1a
 		i++
@@ -1190,19 +999,19 @@ func (m *Span) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x32
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(types.SizeOfStdTime(m.StartTime)))
-	n7, err := types.StdTimeMarshalTo(m.StartTime, dAtA[i:])
+	n4, err := types.StdTimeMarshalTo(m.StartTime, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n7
+	i += n4
 	dAtA[i] = 0x3a
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(types.SizeOfStdDuration(m.Duration)))
-	n8, err := types.StdDurationMarshalTo(m.Duration, dAtA[i:])
+	n5, err := types.StdDurationMarshalTo(m.Duration, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n8
+	i += n5
 	if len(m.Tags) > 0 {
 		for _, msg := range m.Tags {
 			dAtA[i] = 0x42
@@ -1231,11 +1040,11 @@ func (m *Span) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x52
 		i++
 		i = encodeVarintJaeger(dAtA, i, uint64(m.Process.Size()))
-		n9, err := m.Process.MarshalTo(dAtA[i:])
+		n6, err := m.Process.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i += n6
 	}
 	if len(m.ProcessID) > 0 {
 		dAtA[i] = 0x5a
@@ -1257,6 +1066,37 @@ func (m *Span) MarshalTo(dAtA []byte) (int, error) {
 			i++
 			i += copy(dAtA[i:], s)
 		}
+	}
+	return i, nil
+}
+
+func (m *Span2) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Span2) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	dAtA[i] = 0xa
+	i++
+	i = encodeVarintJaeger(dAtA, i, uint64(m.TraceID.Size()))
+	n7, err := m.TraceID.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n7
+	if m.SpanID != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintJaeger(dAtA, i, uint64(m.SpanID))
 	}
 	return i, nil
 }
@@ -1289,31 +1129,64 @@ func (m *Trace) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.ProcessMap) > 0 {
-		for k, _ := range m.ProcessMap {
+		for _, msg := range m.ProcessMap {
 			dAtA[i] = 0x12
 			i++
-			v := m.ProcessMap[k]
-			msgSize := 0
-			if (&v) != nil {
-				msgSize = (&v).Size()
-				msgSize += 1 + sovJaeger(uint64(msgSize))
-			}
-			mapSize := 1 + len(k) + sovJaeger(uint64(len(k))) + msgSize
-			i = encodeVarintJaeger(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0xa
-			i++
-			i = encodeVarintJaeger(dAtA, i, uint64(len(k)))
-			i += copy(dAtA[i:], k)
-			dAtA[i] = 0x12
-			i++
-			i = encodeVarintJaeger(dAtA, i, uint64((&v).Size()))
-			n10, err := (&v).MarshalTo(dAtA[i:])
+			i = encodeVarintJaeger(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
 			if err != nil {
 				return 0, err
 			}
-			i += n10
+			i += n
 		}
 	}
+	if len(m.Warnings) > 0 {
+		for _, s := range m.Warnings {
+			dAtA[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	return i, nil
+}
+
+func (m *Trace_ProcessMapping) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Trace_ProcessMapping) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ProcessID) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintJaeger(dAtA, i, uint64(len(m.ProcessID)))
+		i += copy(dAtA[i:], m.ProcessID)
+	}
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintJaeger(dAtA, i, uint64(m.Process.Size()))
+	n8, err := m.Process.MarshalTo(dAtA[i:])
+	if err != nil {
+		return 0, err
+	}
+	i += n8
 	return i, nil
 }
 
@@ -1347,11 +1220,11 @@ func (m *Batch) MarshalTo(dAtA []byte) (int, error) {
 	dAtA[i] = 0x12
 	i++
 	i = encodeVarintJaeger(dAtA, i, uint64(m.Process.Size()))
-	n11, err := m.Process.MarshalTo(dAtA[i:])
+	n9, err := m.Process.MarshalTo(dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
-	i += n11
+	i += n9
 	return i, nil
 }
 
@@ -1400,62 +1273,6 @@ func (m *TraceID) Size() (n int) {
 	return n
 }
 
-func (m *SpanID) Size() (n int) {
-	var l int
-	_ = l
-	if m.Value != 0 {
-		n += 1 + sovJaeger(uint64(m.Value))
-	}
-	return n
-}
-
-func (m *KeyValue2) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Key)
-	if l > 0 {
-		n += 1 + l + sovJaeger(uint64(l))
-	}
-	if m.Value != nil {
-		n += m.Value.Size()
-	}
-	return n
-}
-
-func (m *KeyValue2_VStr) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.VStr)
-	n += 1 + l + sovJaeger(uint64(l))
-	return n
-}
-func (m *KeyValue2_VDouble) Size() (n int) {
-	var l int
-	_ = l
-	n += 9
-	return n
-}
-func (m *KeyValue2_VBool) Size() (n int) {
-	var l int
-	_ = l
-	n += 2
-	return n
-}
-func (m *KeyValue2_VLong) Size() (n int) {
-	var l int
-	_ = l
-	n += 1 + sovJaeger(uint64(m.VLong))
-	return n
-}
-func (m *KeyValue2_VBinary) Size() (n int) {
-	var l int
-	_ = l
-	if m.VBinary != nil {
-		l = len(m.VBinary)
-		n += 1 + l + sovJaeger(uint64(l))
-	}
-	return n
-}
 func (m *KeyValue) Size() (n int) {
 	var l int
 	_ = l
@@ -1505,10 +1322,11 @@ func (m *SpanRef) Size() (n int) {
 	_ = l
 	l = m.TraceID.Size()
 	n += 1 + l + sovJaeger(uint64(l))
-	l = m.SpanID.Size()
-	n += 1 + l + sovJaeger(uint64(l))
-	if m.Type != 0 {
-		n += 1 + sovJaeger(uint64(m.Type))
+	if m.SpanID != 0 {
+		n += 1 + sovJaeger(uint64(m.SpanID))
+	}
+	if m.RefType != 0 {
+		n += 1 + sovJaeger(uint64(m.RefType))
 	}
 	return n
 }
@@ -1534,8 +1352,9 @@ func (m *Span) Size() (n int) {
 	_ = l
 	l = m.TraceID.Size()
 	n += 1 + l + sovJaeger(uint64(l))
-	l = m.SpanID.Size()
-	n += 1 + l + sovJaeger(uint64(l))
+	if m.SpanID != 0 {
+		n += 1 + sovJaeger(uint64(m.SpanID))
+	}
 	l = len(m.OperationName)
 	if l > 0 {
 		n += 1 + l + sovJaeger(uint64(l))
@@ -1582,6 +1401,17 @@ func (m *Span) Size() (n int) {
 	return n
 }
 
+func (m *Span2) Size() (n int) {
+	var l int
+	_ = l
+	l = m.TraceID.Size()
+	n += 1 + l + sovJaeger(uint64(l))
+	if m.SpanID != 0 {
+		n += 1 + sovJaeger(uint64(m.SpanID))
+	}
+	return n
+}
+
 func (m *Trace) Size() (n int) {
 	var l int
 	_ = l
@@ -1592,14 +1422,29 @@ func (m *Trace) Size() (n int) {
 		}
 	}
 	if len(m.ProcessMap) > 0 {
-		for k, v := range m.ProcessMap {
-			_ = k
-			_ = v
-			l = v.Size()
-			mapEntrySize := 1 + len(k) + sovJaeger(uint64(len(k))) + 1 + l + sovJaeger(uint64(l))
-			n += mapEntrySize + 1 + sovJaeger(uint64(mapEntrySize))
+		for _, e := range m.ProcessMap {
+			l = e.Size()
+			n += 1 + l + sovJaeger(uint64(l))
 		}
 	}
+	if len(m.Warnings) > 0 {
+		for _, s := range m.Warnings {
+			l = len(s)
+			n += 1 + l + sovJaeger(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *Trace_ProcessMapping) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ProcessID)
+	if l > 0 {
+		n += 1 + l + sovJaeger(uint64(l))
+	}
+	l = m.Process.Size()
+	n += 1 + l + sovJaeger(uint64(l))
 	return n
 }
 
@@ -1707,265 +1552,6 @@ func (m *TraceID) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipJaeger(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *SpanID) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowJaeger
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: SpanID: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: SpanID: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Value", wireType)
-			}
-			m.Value = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Value |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipJaeger(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *KeyValue2) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowJaeger
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: KeyValue2: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: KeyValue2: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Key = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VStr", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Value = &KeyValue2_VStr{string(dAtA[iNdEx:postIndex])}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 1 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VDouble", wireType)
-			}
-			var v uint64
-			if (iNdEx + 8) > l {
-				return io.ErrUnexpectedEOF
-			}
-			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-			iNdEx += 8
-			m.Value = &KeyValue2_VDouble{float64(math.Float64frombits(v))}
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VBool", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			b := bool(v != 0)
-			m.Value = &KeyValue2_VBool{b}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VLong", wireType)
-			}
-			var v int64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.Value = &KeyValue2_VLong{v}
-		case 6:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field VBinary", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJaeger
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := make([]byte, postIndex-iNdEx)
-			copy(v, dAtA[iNdEx:postIndex])
-			m.Value = &KeyValue2_VBinary{v}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipJaeger(dAtA[iNdEx:])
@@ -2138,7 +1724,7 @@ func (m *KeyValue) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.VLong |= (uint64(b) & 0x7F) << shift
+				m.VLong |= (int64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2366,10 +1952,10 @@ func (m *SpanRef) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SpanID", wireType)
 			}
-			var msglen int
+			m.SpanID = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowJaeger
@@ -2379,27 +1965,16 @@ func (m *SpanRef) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				m.SpanID |= (SpanID(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.SpanID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 3:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field RefType", wireType)
 			}
-			m.Type = 0
+			m.RefType = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowJaeger
@@ -2409,7 +1984,7 @@ func (m *SpanRef) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Type |= (SpanRefType(b) & 0x7F) << shift
+				m.RefType |= (SpanRefType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2605,10 +2180,10 @@ func (m *Span) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SpanID", wireType)
 			}
-			var msglen int
+			m.SpanID = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowJaeger
@@ -2618,22 +2193,11 @@ func (m *Span) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				m.SpanID |= (SpanID(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
-				return ErrInvalidLengthJaeger
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.SpanID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field OperationName", wireType)
@@ -2708,7 +2272,7 @@ func (m *Span) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Flags |= (uint32(b) & 0x7F) << shift
+				m.Flags |= (Flags(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2947,6 +2511,105 @@ func (m *Span) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *Span2) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJaeger
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Span2: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Span2: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TraceID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJaeger
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.TraceID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SpanID", wireType)
+			}
+			m.SpanID = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJaeger
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SpanID |= (SpanID(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJaeger(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *Trace) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3002,7 +2665,7 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Spans = append(m.Spans, Span{})
+			m.Spans = append(m.Spans, &Span{})
 			if err := m.Spans[len(m.Spans)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3033,102 +2696,148 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.ProcessMap == nil {
-				m.ProcessMap = make(map[string]Process)
+			m.ProcessMap = append(m.ProcessMap, Trace_ProcessMapping{})
+			if err := m.ProcessMap[len(m.ProcessMap)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			var mapkey string
-			mapvalue := &Process{}
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowJaeger
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Warnings", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJaeger
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowJaeger
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthJaeger
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var mapmsglen int
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowJaeger
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapmsglen |= (int(b) & 0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					if mapmsglen < 0 {
-						return ErrInvalidLengthJaeger
-					}
-					postmsgIndex := iNdEx + mapmsglen
-					if mapmsglen < 0 {
-						return ErrInvalidLengthJaeger
-					}
-					if postmsgIndex > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = &Process{}
-					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
-						return err
-					}
-					iNdEx = postmsgIndex
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipJaeger(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if skippy < 0 {
-						return ErrInvalidLengthJaeger
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
 				}
 			}
-			m.ProcessMap[mapkey] = *mapvalue
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Warnings = append(m.Warnings, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipJaeger(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Trace_ProcessMapping) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowJaeger
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProcessMapping: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProcessMapping: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProcessID", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJaeger
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProcessID = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Process", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowJaeger
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthJaeger
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Process.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3206,7 +2915,7 @@ func (m *Batch) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Spans = append(m.Spans, Span{})
+			m.Spans = append(m.Spans, &Span{})
 			if err := m.Spans[len(m.Spans)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3450,75 +3159,71 @@ func init() { proto.RegisterFile("jaeger.proto", fileDescriptorJaeger) }
 func init() { golang_proto.RegisterFile("jaeger.proto", fileDescriptorJaeger) }
 
 var fileDescriptorJaeger = []byte{
-	// 1108 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x56, 0x4b, 0x6f, 0xe3, 0xd4,
-	0x17, 0xcf, 0x4d, 0x9c, 0xd7, 0x49, 0xda, 0xc9, 0xff, 0x4e, 0xff, 0x23, 0x93, 0x19, 0x32, 0xc1,
-	0x52, 0xd5, 0x50, 0x4d, 0x63, 0x1a, 0x34, 0x08, 0x95, 0x05, 0xaa, 0x9b, 0x3e, 0x32, 0xa4, 0x4d,
-	0x71, 0xca, 0xf0, 0x10, 0x52, 0xe5, 0x24, 0x37, 0xae, 0x21, 0xf1, 0xb5, 0x6c, 0x27, 0x55, 0x84,
-	0xd8, 0xb0, 0x47, 0xe2, 0x21, 0x21, 0x3e, 0x00, 0x5f, 0x82, 0x1d, 0x2b, 0x34, 0x4b, 0x24, 0xf6,
-	0x80, 0x0a, 0x1f, 0x04, 0xdd, 0x57, 0xd2, 0x97, 0x54, 0x58, 0xb0, 0x69, 0xef, 0x39, 0xe7, 0x77,
-	0x8e, 0xcf, 0xef, 0x9c, 0x5f, 0xae, 0x0d, 0xc5, 0x4f, 0x1c, 0xe2, 0x92, 0xb0, 0x1e, 0x84, 0x34,
-	0xa6, 0x38, 0x23, 0xac, 0xf2, 0x43, 0x97, 0x52, 0x77, 0x44, 0x4c, 0xee, 0xed, 0x4d, 0x86, 0x26,
-	0x19, 0x07, 0xf1, 0x4c, 0x80, 0xca, 0x8f, 0xaf, 0x07, 0x63, 0x6f, 0x4c, 0xa2, 0xd8, 0x19, 0x07,
-	0x12, 0x50, 0xb9, 0x0e, 0x18, 0x4c, 0x42, 0x27, 0xf6, 0xa8, 0x2f, 0xe3, 0x8f, 0x64, 0xdc, 0x09,
-	0x3c, 0xd3, 0xf1, 0x7d, 0x1a, 0xf3, 0x60, 0x24, 0xa3, 0x4f, 0xf8, 0xbf, 0xfe, 0x86, 0x4b, 0xfc,
-	0x8d, 0xe8, 0xdc, 0x71, 0x5d, 0x12, 0x9a, 0x34, 0xe0, 0x88, 0x5b, 0xd0, 0x1b, 0xae, 0x17, 0x9f,
-	0x4d, 0x7a, 0xf5, 0x3e, 0x1d, 0x9b, 0x2e, 0x75, 0xe9, 0xe2, 0xa1, 0xcc, 0xe2, 0x06, 0x3f, 0x09,
-	0xb8, 0x61, 0x42, 0xf6, 0x24, 0x74, 0xfa, 0xa4, 0xd5, 0xc4, 0x25, 0x48, 0x8d, 0xe8, 0xb9, 0x8e,
-	0xaa, 0xa8, 0xa6, 0xd9, 0xec, 0x88, 0x31, 0x68, 0x67, 0x9e, 0x7b, 0xa6, 0x27, 0xb9, 0x8b, 0x9f,
-	0x8d, 0x0a, 0x64, 0xba, 0x81, 0xe3, 0xb7, 0x9a, 0x78, 0x05, 0xd2, 0xcf, 0x9d, 0xd1, 0x84, 0xc8,
-	0x0c, 0x61, 0x18, 0x3f, 0x20, 0xc8, 0xbf, 0x43, 0x66, 0xdc, 0x68, 0xb0, 0x9a, 0x9f, 0x92, 0x19,
-	0x47, 0xe4, 0x6d, 0x76, 0xc4, 0x2b, 0xa0, 0x4d, 0xbb, 0x71, 0xc8, 0x6b, 0xe6, 0x0f, 0x12, 0x36,
-	0xb7, 0x70, 0x19, 0xb2, 0xd3, 0x26, 0x9d, 0xf4, 0x46, 0x44, 0x4f, 0x55, 0x51, 0x0d, 0x1d, 0x24,
-	0x6c, 0xe5, 0xc0, 0x0f, 0x20, 0x3d, 0xb5, 0x28, 0x1d, 0xe9, 0x5a, 0x15, 0xd5, 0x72, 0x07, 0x09,
-	0x5b, 0x98, 0xdc, 0xdf, 0xa6, 0xbe, 0xab, 0xa7, 0xab, 0xa8, 0x96, 0xe2, 0x7e, 0x66, 0xf2, 0x5a,
-	0x96, 0xe7, 0x3b, 0xe1, 0x4c, 0xcf, 0x54, 0x51, 0xad, 0xc8, 0x6b, 0x09, 0x87, 0x95, 0x85, 0xf4,
-	0x94, 0xb7, 0xf9, 0x23, 0x82, 0x9c, 0x6a, 0xf3, 0x96, 0x2e, 0xd7, 0x20, 0x3d, 0x3d, 0x99, 0x05,
-	0x84, 0xb7, 0xb9, 0xdc, 0xf8, 0x5f, 0x5d, 0xaa, 0x82, 0xe3, 0x59, 0xc0, 0x16, 0x71, 0x36, 0x22,
-	0x4e, 0x27, 0xc5, 0x73, 0x05, 0x19, 0x7d, 0x41, 0x86, 0xb5, 0x8c, 0x16, 0x54, 0x56, 0x14, 0x15,
-	0xd6, 0x72, 0x4e, 0x11, 0x59, 0x51, 0x44, 0x32, 0x62, 0x90, 0x82, 0x86, 0xbe, 0xa0, 0x91, 0x65,
-	0x34, 0xe6, 0x24, 0x8c, 0x19, 0xa4, 0xda, 0xd4, 0xc5, 0x16, 0xe4, 0xe7, 0x42, 0xe3, 0xbd, 0x17,
-	0x1a, 0xe5, 0xba, 0x50, 0x52, 0x5d, 0x2d, 0xbd, 0x7e, 0xa2, 0x10, 0x56, 0xee, 0xc5, 0x6f, 0x8f,
-	0x13, 0x5f, 0xfd, 0xfe, 0x18, 0xd9, 0x8b, 0x34, 0x5c, 0x87, 0xcc, 0xd0, 0x23, 0xa3, 0x41, 0xa4,
-	0x27, 0xab, 0xa9, 0x5a, 0xa1, 0x51, 0x52, 0x44, 0xd5, 0x6c, 0x2c, 0x8d, 0xa5, 0xd9, 0x12, 0x65,
-	0x7c, 0x8d, 0x20, 0xcb, 0xd6, 0x6f, 0x93, 0x21, 0x36, 0x21, 0x1b, 0x0b, 0xe9, 0xc8, 0xa7, 0xdf,
-	0x53, 0xc9, 0x52, 0x51, 0x32, 0x57, 0xa1, 0xf0, 0x13, 0xc8, 0x44, 0x5c, 0x3a, 0x7c, 0xaa, 0x85,
-	0xc6, 0xb2, 0xc2, 0x0b, 0x41, 0xa9, 0x47, 0x09, 0x0c, 0x5e, 0x03, 0x2d, 0x66, 0x1b, 0x48, 0xf1,
-	0x0d, 0xdc, 0xbf, 0x8c, 0xb5, 0xc9, 0x90, 0xef, 0x80, 0x03, 0x8c, 0x0f, 0x20, 0x7b, 0x1c, 0xd2,
-	0x3e, 0x89, 0x22, 0xfc, 0x0a, 0x14, 0x23, 0x12, 0x4e, 0xbd, 0x3e, 0x39, 0xf5, 0x9d, 0x31, 0x91,
-	0x1b, 0x2d, 0x48, 0xdf, 0x91, 0x33, 0x26, 0x78, 0x1d, 0xb4, 0xd8, 0x71, 0xef, 0xe2, 0xcb, 0x31,
-	0xc6, 0x77, 0x1a, 0x68, 0xec, 0x79, 0xff, 0x35, 0xd5, 0x55, 0x58, 0xa6, 0x01, 0x11, 0x57, 0x82,
-	0x68, 0x5c, 0xc8, 0x69, 0x69, 0xee, 0xe5, 0xad, 0x3f, 0x05, 0x08, 0xc9, 0x90, 0x84, 0xc4, 0xef,
-	0x93, 0x48, 0xd7, 0x38, 0x81, 0x7b, 0xd7, 0xe6, 0x22, 0x2b, 0x5f, 0x02, 0x32, 0x79, 0x0d, 0x47,
-	0x8c, 0x32, 0x13, 0xdd, 0x92, 0x2d, 0x0c, 0xa6, 0x9e, 0x28, 0x76, 0xc2, 0x98, 0x09, 0x84, 0x0b,
-	0xef, 0x1f, 0xab, 0x67, 0x9e, 0x86, 0xdf, 0x86, 0x9c, 0xba, 0xc9, 0xb8, 0x46, 0x0b, 0x8d, 0x97,
-	0x6e, 0x94, 0x68, 0x4a, 0x80, 0xa8, 0xf0, 0x3d, 0xab, 0x30, 0x4f, 0x9a, 0x2f, 0x23, 0x77, 0xf7,
-	0x32, 0xf0, 0x2a, 0x68, 0x23, 0xea, 0x46, 0x7a, 0x9e, 0x63, 0x0b, 0x0a, 0xdb, 0xa6, 0xae, 0x82,
-	0xb1, 0x30, 0x7e, 0x15, 0xb2, 0x81, 0x50, 0x83, 0x0e, 0x57, 0x57, 0x25, 0x45, 0x62, 0xab, 0x38,
-	0x7e, 0x04, 0x79, 0x79, 0x6c, 0x35, 0xf5, 0x02, 0x9f, 0xf8, 0xc2, 0x81, 0xcb, 0x90, 0x3b, 0x77,
-	0x42, 0xdf, 0xf3, 0xdd, 0x48, 0x2f, 0x56, 0x53, 0xb5, 0xbc, 0x3d, 0xb7, 0x8d, 0x9f, 0x11, 0xa4,
-	0xf9, 0xe6, 0x71, 0x0d, 0xd2, 0x6c, 0x89, 0x91, 0x8e, 0x78, 0x5b, 0xc5, 0xcb, 0xeb, 0x90, 0x7d,
-	0x09, 0x00, 0xde, 0x01, 0x90, 0xc5, 0x0f, 0x9d, 0x40, 0xca, 0xef, 0xe5, 0x2b, 0x32, 0x52, 0x1d,
-	0x1e, 0x3a, 0xc1, 0xae, 0x1f, 0x87, 0x33, 0xb5, 0xcb, 0x45, 0x5a, 0xf9, 0x08, 0xee, 0x5d, 0x03,
-	0xdd, 0x72, 0x79, 0xad, 0xca, 0x4b, 0x4e, 0x6a, 0xef, 0xc6, 0x00, 0x44, 0x74, 0x2b, 0xf9, 0x26,
-	0x32, 0x7a, 0x90, 0xb6, 0x9c, 0xb8, 0x7f, 0xf6, 0x2f, 0x78, 0x98, 0x8b, 0x01, 0xdf, 0x5e, 0x5f,
-	0xfd, 0x16, 0x24, 0xca, 0x78, 0x04, 0xb0, 0x4f, 0x62, 0xf5, 0x96, 0x59, 0x86, 0xa4, 0x37, 0x90,
-	0xdd, 0x26, 0xbd, 0xc1, 0xfa, 0x0e, 0xe4, 0xe7, 0x97, 0x2a, 0x06, 0xc8, 0x74, 0x4f, 0xec, 0xd6,
-	0xd1, 0x7e, 0x29, 0xc1, 0xce, 0xcd, 0xce, 0x7b, 0x56, 0x7b, 0xb7, 0x84, 0x70, 0x0e, 0x34, 0xab,
-	0xd3, 0x69, 0x97, 0x92, 0xec, 0xd4, 0xee, 0x1c, 0xed, 0x97, 0x52, 0x2c, 0x6e, 0xb5, 0x8e, 0xb6,
-	0xed, 0x0f, 0x4b, 0xda, 0xfa, 0x06, 0x14, 0x2e, 0xdd, 0x0b, 0xb8, 0x08, 0xb9, 0x9d, 0x83, 0x56,
-	0xbb, 0x79, 0xda, 0xd9, 0x2b, 0x25, 0x70, 0x09, 0x8a, 0x7b, 0x9d, 0x76, 0xbb, 0xf3, 0x7e, 0xf7,
-	0x74, 0xcf, 0xee, 0x1c, 0x96, 0x50, 0xa3, 0x07, 0x78, 0x87, 0x8e, 0x46, 0xa4, 0x1f, 0xd3, 0xb0,
-	0x2b, 0xee, 0x86, 0xe7, 0x9b, 0xb8, 0x0d, 0xf9, 0x63, 0x1a, 0xc5, 0x5d, 0xce, 0x72, 0x49, 0x91,
-	0xe2, 0xe3, 0x29, 0x3f, 0xb8, 0xa1, 0xeb, 0x5d, 0xf6, 0x01, 0x60, 0xe8, 0x5f, 0xfc, 0xfa, 0xd7,
-	0xb7, 0x49, 0x6c, 0x2c, 0xf1, 0x77, 0xf7, 0x74, 0xd3, 0xe4, 0x33, 0xda, 0x42, 0xeb, 0x8d, 0x8f,
-	0x61, 0xf9, 0xdd, 0x09, 0x09, 0x67, 0x8b, 0xfa, 0xcf, 0x20, 0xa7, 0xe6, 0x80, 0xb1, 0x2a, 0xbf,
-	0x98, 0x4c, 0x79, 0xe9, 0x8a, 0x18, 0x8c, 0x87, 0xbc, 0xf4, 0xff, 0xf1, 0x7d, 0x55, 0x9a, 0xdf,
-	0x2d, 0x91, 0xf9, 0x99, 0x37, 0xf8, 0xdc, 0xfa, 0x12, 0x7d, 0xb3, 0x6d, 0xe1, 0x74, 0x23, 0xb5,
-	0x59, 0x7f, 0x6d, 0x3d, 0x89, 0x92, 0xe1, 0x53, 0x80, 0x67, 0x3c, 0xbb, 0xba, 0x7d, 0xdc, 0xc2,
-	0x6b, 0x67, 0x71, 0x1c, 0x44, 0x5b, 0xa6, 0x79, 0xe9, 0x63, 0x40, 0x14, 0x67, 0x45, 0x3c, 0xdf,
-	0x95, 0xd6, 0x8b, 0x8b, 0x0a, 0xfa, 0xe5, 0xa2, 0x82, 0xfe, 0xb8, 0xa8, 0xa0, 0x9f, 0xfe, 0xac,
-	0xa0, 0x8f, 0xde, 0xb8, 0x23, 0xc1, 0x1c, 0xd3, 0x01, 0x19, 0x89, 0x6f, 0x8a, 0xb7, 0xf8, 0x5f,
-	0xee, 0xe8, 0x65, 0xf8, 0xf9, 0xf5, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0xf3, 0x9a, 0xed, 0x9b,
-	0x3e, 0x09, 0x00, 0x00,
+	// 1054 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x55, 0xcd, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0xd8, 0xeb, 0xaf, 0xe7, 0x8f, 0x9a, 0x29, 0xa0, 0xc5, 0x8d, 0x62, 0xb3, 0xa8, 0xd4,
+	0x04, 0xe2, 0x25, 0x46, 0xbd, 0x84, 0x03, 0xca, 0xc6, 0x4d, 0x70, 0xd9, 0xc4, 0x61, 0x1d, 0xca,
+	0x87, 0x2a, 0x85, 0x8d, 0x3d, 0xde, 0x2c, 0xac, 0x77, 0x56, 0xbb, 0x6b, 0x47, 0x16, 0xe2, 0xd2,
+	0xbf, 0x80, 0x8f, 0x0b, 0x37, 0xe0, 0x3f, 0x41, 0xe2, 0xd2, 0x23, 0x12, 0x37, 0x0e, 0x05, 0x05,
+	0x0e, 0x3d, 0xf0, 0x47, 0xa0, 0x99, 0x9d, 0xb1, 0xe3, 0xb4, 0x52, 0xca, 0xa1, 0x17, 0xfb, 0x7d,
+	0xfc, 0xde, 0x9b, 0xf7, 0xde, 0xef, 0xed, 0x0c, 0x94, 0xbe, 0xb0, 0x89, 0x43, 0xc2, 0x56, 0x10,
+	0xd2, 0x98, 0xe2, 0x6c, 0xa2, 0xd5, 0x6e, 0x38, 0x94, 0x3a, 0x1e, 0xd1, 0xb9, 0xf5, 0x64, 0x32,
+	0xd2, 0xc9, 0x38, 0x88, 0x67, 0x09, 0xa8, 0x56, 0xbf, 0xec, 0x8c, 0xdd, 0x31, 0x89, 0x62, 0x7b,
+	0x1c, 0x08, 0xc0, 0xda, 0x65, 0xc0, 0x70, 0x12, 0xda, 0xb1, 0x4b, 0x7d, 0xe1, 0x5f, 0x15, 0x7e,
+	0x3b, 0x70, 0x75, 0xdb, 0xf7, 0x69, 0xcc, 0x9d, 0x91, 0xf0, 0xbe, 0xc5, 0xff, 0x06, 0x1b, 0x0e,
+	0xf1, 0x37, 0xa2, 0x33, 0xdb, 0x71, 0x48, 0xa8, 0xd3, 0x80, 0x23, 0x9e, 0x82, 0xde, 0x70, 0xdc,
+	0xf8, 0x74, 0x72, 0xd2, 0x1a, 0xd0, 0xb1, 0xee, 0x50, 0x87, 0x2e, 0x0e, 0x65, 0x1a, 0x57, 0xb8,
+	0x94, 0xc0, 0x35, 0x1d, 0x72, 0x47, 0xa1, 0x3d, 0x20, 0xdd, 0x0e, 0xae, 0x42, 0xda, 0xa3, 0x67,
+	0x2a, 0x6a, 0xa0, 0xa6, 0x62, 0x31, 0x11, 0x63, 0x50, 0x4e, 0x5d, 0xe7, 0x54, 0x4d, 0x71, 0x13,
+	0x97, 0xb5, 0x5f, 0x11, 0xe4, 0x3f, 0x20, 0xb3, 0x7b, 0xb6, 0x37, 0x21, 0x2c, 0xe4, 0x4b, 0x32,
+	0xe3, 0x21, 0x05, 0x8b, 0x89, 0xf8, 0x16, 0x64, 0xa6, 0x47, 0xb3, 0x80, 0xf0, 0x98, 0x4a, 0xfb,
+	0x85, 0x96, 0x18, 0x27, 0xc7, 0x33, 0x87, 0x95, 0xf8, 0x59, 0xee, 0x69, 0x3f, 0x0e, 0xd5, 0x34,
+	0x8f, 0xe5, 0x32, 0x56, 0x21, 0x37, 0xed, 0xd0, 0xc9, 0x89, 0x47, 0x54, 0xa5, 0x81, 0x9a, 0xc8,
+	0x92, 0x2a, 0x7e, 0x11, 0x32, 0x53, 0x83, 0x52, 0x4f, 0xcd, 0x34, 0x50, 0x33, 0x6f, 0x25, 0x0a,
+	0xb7, 0x9a, 0xd4, 0x77, 0xd4, 0x6c, 0x03, 0x35, 0xd3, 0x56, 0xa2, 0xf0, 0x2c, 0x86, 0xeb, 0xdb,
+	0xe1, 0x4c, 0xcd, 0x35, 0x50, 0xb3, 0x64, 0x49, 0x75, 0x2b, 0xff, 0xf8, 0xa7, 0x3a, 0x7a, 0xfc,
+	0x73, 0x1d, 0x69, 0x33, 0x48, 0x9b, 0xd4, 0xc1, 0x06, 0x14, 0xe6, 0x5c, 0xf1, 0x2e, 0x8a, 0xed,
+	0x5a, 0x2b, 0x21, 0xa3, 0x25, 0xe7, 0xd6, 0x3a, 0x92, 0x08, 0x23, 0xff, 0xf0, 0x51, 0x7d, 0xe5,
+	0x9b, 0x3f, 0xeb, 0xc8, 0x5a, 0x84, 0xe1, 0x16, 0x64, 0x47, 0x2e, 0xf1, 0x86, 0x91, 0x9a, 0x6a,
+	0xa4, 0x9b, 0xc5, 0x76, 0x55, 0xb6, 0x2c, 0xa7, 0x64, 0x28, 0x2c, 0xcc, 0x12, 0x28, 0xed, 0x5b,
+	0x04, 0xb9, 0x7e, 0x60, 0xfb, 0x16, 0x19, 0x61, 0x1d, 0x72, 0x71, 0x32, 0x7d, 0x71, 0xfa, 0x35,
+	0x19, 0x2c, 0x48, 0x11, 0xb1, 0x12, 0x85, 0x5f, 0x87, 0x6c, 0x14, 0xd8, 0x7e, 0xb7, 0x93, 0x70,
+	0x62, 0x54, 0x98, 0xfb, 0x8f, 0x47, 0xf5, 0x6c, 0x9f, 0x5b, 0x2d, 0xe1, 0xc5, 0x1b, 0x90, 0x0b,
+	0xc9, 0x88, 0x13, 0x91, 0xe6, 0x44, 0x5c, 0x97, 0x89, 0xc5, 0xd1, 0x9c, 0x0a, 0x89, 0xd1, 0x3e,
+	0x81, 0xdc, 0x61, 0x48, 0x07, 0x24, 0x8a, 0xf0, 0xab, 0x50, 0x8a, 0x48, 0x38, 0x75, 0x07, 0xe4,
+	0xd8, 0xb7, 0xc7, 0x44, 0x70, 0x5b, 0x14, 0xb6, 0x03, 0x7b, 0x4c, 0xf0, 0x3a, 0x28, 0xb1, 0xed,
+	0x5c, 0xd5, 0x2f, 0xc7, 0x68, 0x3f, 0x2a, 0xa0, 0xb0, 0x23, 0x9f, 0x5f, 0xab, 0x37, 0xa1, 0x42,
+	0x03, 0x92, 0x7c, 0x4f, 0x49, 0xc9, 0xc9, 0x4a, 0x95, 0xe7, 0x56, 0x5e, 0xf4, 0x6d, 0x80, 0x90,
+	0x8c, 0x48, 0x48, 0xfc, 0x01, 0x89, 0x54, 0x85, 0x97, 0x7e, 0xed, 0xd2, 0x50, 0x44, 0x09, 0x17,
+	0x80, 0xf8, 0x35, 0xc8, 0x8c, 0x3c, 0xd6, 0x2c, 0x5b, 0xbc, 0xb2, 0x51, 0x16, 0x45, 0x64, 0x76,
+	0x99, 0xd1, 0x4a, 0x7c, 0x6c, 0x8d, 0xa2, 0xd8, 0x0e, 0x63, 0xb6, 0x29, 0x7c, 0x17, 0x9f, 0x79,
+	0x8d, 0xe6, 0x61, 0xf8, 0x3d, 0xc8, 0xcb, 0x5b, 0x81, 0xaf, 0x6d, 0xb1, 0xfd, 0xca, 0x13, 0x29,
+	0x3a, 0x02, 0x90, 0x64, 0xf8, 0x81, 0x65, 0x98, 0x07, 0xcd, 0x59, 0xc9, 0x5f, 0xcd, 0x0a, 0xbe,
+	0x09, 0x8a, 0x47, 0x9d, 0x48, 0x2d, 0x70, 0x6c, 0x51, 0x62, 0x4d, 0xea, 0x48, 0x18, 0x73, 0xe3,
+	0x37, 0x20, 0x17, 0x24, 0x6b, 0xa1, 0xc2, 0x32, 0x67, 0x62, 0x5b, 0x2c, 0xe9, 0xc7, 0xab, 0x50,
+	0x10, 0x62, 0xb7, 0xa3, 0x16, 0x39, 0x01, 0x0b, 0x03, 0xae, 0x41, 0xfe, 0xcc, 0x0e, 0x7d, 0xd7,
+	0x77, 0x22, 0xb5, 0xd4, 0x48, 0x37, 0x0b, 0xd6, 0x5c, 0xd7, 0x3e, 0x87, 0x0c, 0x1b, 0x7f, 0xfb,
+	0xb9, 0x6d, 0x88, 0xf6, 0x2f, 0x82, 0x0c, 0x4f, 0x81, 0x35, 0xc8, 0x30, 0x5b, 0xa4, 0x22, 0xde,
+	0x78, 0x69, 0x89, 0xff, 0xc4, 0x85, 0x0d, 0x00, 0x51, 0xf8, 0xbe, 0x1d, 0x88, 0x1d, 0x5f, 0x5d,
+	0xaa, 0x44, 0x76, 0xbf, 0x6f, 0x07, 0x81, 0xeb, 0xcb, 0x91, 0x5d, 0x88, 0x5a, 0xea, 0x37, 0xbd,
+	0xdc, 0x6f, 0xed, 0x18, 0x2a, 0xcb, 0xf1, 0xcb, 0xb3, 0x43, 0x97, 0x67, 0xa7, 0x2f, 0x48, 0x48,
+	0x3d, 0x95, 0x04, 0x39, 0x16, 0x81, 0xd2, 0xee, 0x43, 0xc6, 0xb0, 0xe3, 0xc1, 0xe9, 0x33, 0x75,
+	0xfb, 0xbf, 0xb3, 0xaf, 0x02, 0xec, 0x91, 0x58, 0xbe, 0x19, 0x15, 0x48, 0xb9, 0x43, 0x51, 0x73,
+	0xca, 0x1d, 0xae, 0xef, 0x40, 0x61, 0x7e, 0xd3, 0x63, 0x80, 0x6c, 0xff, 0xc8, 0xea, 0x1e, 0xec,
+	0x55, 0x57, 0x98, 0xdc, 0xe9, 0x7d, 0x64, 0x98, 0x77, 0xaa, 0x08, 0xe7, 0x41, 0x31, 0x7a, 0x3d,
+	0xb3, 0x9a, 0x62, 0x92, 0xd9, 0x3b, 0xd8, 0xab, 0xa6, 0x99, 0xdf, 0xe8, 0x1e, 0x6c, 0x5b, 0x9f,
+	0x56, 0x95, 0xf5, 0x0d, 0x28, 0x5e, 0xb8, 0xa5, 0x70, 0x09, 0xf2, 0x3b, 0xef, 0x77, 0xcd, 0xce,
+	0x71, 0x6f, 0xb7, 0xba, 0x82, 0xab, 0x50, 0xda, 0xed, 0x99, 0x66, 0xef, 0xe3, 0xfe, 0xf1, 0xae,
+	0xd5, 0xdb, 0xaf, 0xa2, 0xf6, 0x09, 0xe0, 0x1d, 0xea, 0x79, 0x64, 0x10, 0xd3, 0xb0, 0x9f, 0x5c,
+	0x53, 0xf7, 0x36, 0xb1, 0x09, 0x85, 0x43, 0x1a, 0xc5, 0x7d, 0xde, 0x65, 0x59, 0x36, 0xc5, 0x07,
+	0x53, 0x7b, 0xf9, 0x89, 0x2f, 0xeb, 0x0e, 0x7b, 0xce, 0x35, 0xf5, 0xc1, 0xef, 0xff, 0x7c, 0x9f,
+	0xc2, 0x5a, 0x99, 0xbf, 0xc4, 0xd3, 0x4d, 0x9d, 0xcf, 0x68, 0x0b, 0xad, 0xb7, 0xef, 0x43, 0xe5,
+	0xc3, 0x09, 0x09, 0x67, 0x8b, 0xfc, 0x77, 0x21, 0x2f, 0xe7, 0x80, 0xb1, 0x4c, 0xbf, 0x98, 0x4c,
+	0xad, 0xbc, 0xb4, 0x32, 0xda, 0x0d, 0x9e, 0xfa, 0x25, 0x7c, 0x5d, 0xa6, 0xe6, 0x4b, 0x1c, 0xe9,
+	0x5f, 0xb9, 0xc3, 0xaf, 0x8d, 0x07, 0xe8, 0xbb, 0x6d, 0x03, 0x67, 0xda, 0xe9, 0xcd, 0xd6, 0xdb,
+	0xeb, 0x29, 0x94, 0x0a, 0x6f, 0x03, 0xdc, 0xe5, 0xd1, 0x8d, 0xed, 0xc3, 0x2e, 0xbe, 0x75, 0x1a,
+	0xc7, 0x41, 0xb4, 0xa5, 0xeb, 0x17, 0x9e, 0xf6, 0x24, 0x39, 0x4b, 0xe2, 0xfa, 0x8e, 0xd0, 0x1e,
+	0x9e, 0xaf, 0xa1, 0xdf, 0xce, 0xd7, 0xd0, 0x5f, 0xe7, 0x6b, 0xe8, 0x97, 0xbf, 0xd7, 0xd0, 0x67,
+	0x6f, 0x5e, 0x11, 0xa0, 0x8f, 0xe9, 0x90, 0x78, 0xef, 0xf2, 0xdf, 0x93, 0x2c, 0x1f, 0xc6, 0x3b,
+	0xff, 0x05, 0x00, 0x00, 0xff, 0xff, 0x01, 0x9d, 0xe9, 0x30, 0x01, 0x09, 0x00, 0x00,
 }

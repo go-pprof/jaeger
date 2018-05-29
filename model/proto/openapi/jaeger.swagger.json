@@ -67,6 +67,17 @@
     }
   },
   "definitions": {
+    "TraceProcessMapping": {
+      "type": "object",
+      "properties": {
+        "processID": {
+          "type": "string"
+        },
+        "process": {
+          "$ref": "#/definitions/jaegerProcess"
+        }
+      }
+    },
     "jaegerBatch": {
       "type": "object",
       "properties": {
@@ -103,7 +114,7 @@
         },
         "vLong": {
           "type": "string",
-          "format": "uint64"
+          "format": "int64"
         },
         "vBinary": {
           "type": "string",
@@ -147,7 +158,8 @@
           "$ref": "#/definitions/jaegerTraceID"
         },
         "spanID": {
-          "$ref": "#/definitions/jaegerSpanID"
+          "type": "string",
+          "format": "uint64"
         },
         "operation_name": {
           "type": "string"
@@ -195,15 +207,6 @@
         }
       }
     },
-    "jaegerSpanID": {
-      "type": "object",
-      "properties": {
-        "Value": {
-          "type": "string",
-          "format": "uint64"
-        }
-      }
-    },
     "jaegerSpanRef": {
       "type": "object",
       "properties": {
@@ -211,9 +214,10 @@
           "$ref": "#/definitions/jaegerTraceID"
         },
         "spanID": {
-          "$ref": "#/definitions/jaegerSpanID"
+          "type": "string",
+          "format": "uint64"
         },
-        "type": {
+        "refType": {
           "$ref": "#/definitions/jaegerSpanRefType"
         }
       }
@@ -236,9 +240,15 @@
           }
         },
         "processMap": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/jaegerProcess"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TraceProcessMapping"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }

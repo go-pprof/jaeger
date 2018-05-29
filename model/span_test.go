@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,6 +31,13 @@ import (
 type TraceIDContainer struct {
 	TraceID model.TraceID `json:"id"`
 }
+
+var (
+	_ jsonpb.JSONPBUnmarshaler = new(model.TraceID)
+	_ jsonpb.JSONPBMarshaler   = new(model.TraceID)
+	_ jsonpb.JSONPBUnmarshaler = new(model.SpanID)
+	_ jsonpb.JSONPBMarshaler   = new(model.SpanID)
+)
 
 func TestTraceIDMarshalText(t *testing.T) {
 	testCases := []struct {

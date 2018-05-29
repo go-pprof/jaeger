@@ -21,7 +21,9 @@ import (
 	"io/ioutil"
 	"math"
 	"testing"
+	"time"
 
+	gogojsonpb "github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -31,12 +33,47 @@ import (
 
 const NumberOfFixtures = 1
 
+func TestMarshalJSON(t *testing.T) {
+	span1 := &model.Span{
+		TraceID:       model.TraceID{Low: 1},
+		SpanID:        model.SpanID(2),
+		OperationName: "span",
+		StartTime:     time.Now(),
+		Duration:      time.Microsecond,
+	}
+	trace1 := &model.Trace{
+		Spans: []*model.Span{
+			span1,
+		},
+		ProcessMap: []model.Trace_ProcessMapping{
+			{
+				ProcessID: "p1",
+				Process: model.Process{
+					ServiceName: "abc",
+				},
+			},
+		},
+	}
+	m := &gogojsonpb.Marshaler{}
+	out := &bytes.Buffer{}
+
+	require.NoError(t, m.Marshal(out, trace1))
+	t.Log(out.String())
+	var trace2 model.Trace
+	bb := bytes.NewReader(out.Bytes())
+	require.NoError(t, gogojsonpb.Unmarshal(bb, &trace2))
+	trace1.NormalizeTimestamps()
+	trace2.NormalizeTimestamps()
+	assert.Equal(t, trace1, &trace2)
+}
+
 func TestFromDomain(t *testing.T) {
 	for i := 1; i <= NumberOfFixtures; i++ {
 		domainStr, jsonStr := testReadFixtures(t, i, false)
 
 		var trace model.Trace
-		require.NoError(t, json.Unmarshal(domainStr, &trace))
+		require.NoError(t, gogojsonpb.Unmarshal(bytes.NewReader(domainStr), &trace))
+		// require.NoError(t, json.Unmarshal(domainStr, &trace))
 		uiTrace := FromDomain(&trace)
 
 		testOutput(t, i, jsonStr, uiTrace, false)

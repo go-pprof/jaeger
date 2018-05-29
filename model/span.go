@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"time"
 
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/opentracing/opentracing-go/ext"
 )
 
@@ -31,11 +31,11 @@ const (
 	debugFlag = Flags(2)
 )
 
-// TraceID is a random 128bit identifier for a trace
-type TraceID struct {
-	Low  uint64 `json:"lo"`
-	High uint64 `json:"hi"`
-}
+// // TraceID is a random 128bit identifier for a trace
+// type TraceID struct {
+// 	Low  uint64 `json:"lo"`
+// 	High uint64 `json:"hi"`
+// }
 
 // Flags is a bit map of flags for a span
 type Flags uint32
@@ -44,19 +44,20 @@ type Flags uint32
 type SpanID uint64
 
 // Span represents a unit of work in an application, such as an RPC, a database call, etc.
-type Span struct {
-	TraceID       TraceID       `json:"traceID"`
-	SpanID        SpanID        `json:"spanID"`
-	OperationName string        `json:"operationName"`
-	References    []SpanRef     `json:"references,omitempty"`
-	Flags         Flags         `json:"flags,omitempty"`
-	StartTime     time.Time     `json:"startTime"`
-	Duration      time.Duration `json:"duration"`
-	Tags          []KeyValue    `json:"tags,omitempty"`
-	Logs          []Log         `json:"logs,omitempty"`
-	Process       *Process      `json:"process"`
-	Warnings      []string      `json:"warnings,omitempty"`
-}
+// type Span struct {
+// 	TraceID       TraceID       `json:"traceID"`
+// 	SpanID        SpanID        `json:"spanID"`
+// 	ParentSpanID  SpanID        `json:"parentSpanID"`
+// 	OperationName string        `json:"operationName"`
+// 	References    []SpanRef     `json:"references,omitempty"`
+// 	Flags         Flags         `json:"flags,omitempty"`
+// 	StartTime     time.Time     `json:"startTime"`
+// 	Duration      time.Duration `json:"duration"`
+// 	Tags          []KeyValue    `json:"tags,omitempty"`
+// 	Logs          []Log         `json:"logs,omitempty"`
+// 	Process       *Process      `json:"process"`
+// 	Warnings      []string      `json:"warnings,omitempty"`
+// }
 
 // Hash implements Hash from Hashable.
 func (s *Span) Hash(w io.Writer) (err error) {
@@ -150,9 +151,20 @@ func (f Flags) checkFlags(bit Flags) bool {
 	return f&bit == bit
 }
 
+// MarshalJSON renders span id as a single hex string.
+func (f Flags) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`%d`, f)), nil
+}
+
+func (f *Flags) UnmarshalJSON(b []byte) error {
+	*f = 123 // TODO
+	return nil
+}
+
 // ------- TraceID -------
 
-func (t TraceID) String() string {
+// AsString renders trace id as a single hex string.
+func (t TraceID) AsString() string {
 	if t.High == 0 {
 		return fmt.Sprintf("%x", t.Low)
 	}
@@ -181,24 +193,52 @@ func TraceIDFromString(s string) (TraceID, error) {
 	return TraceID{High: hi, Low: lo}, nil
 }
 
-// MarshalText allows TraceID to serialize itself in JSON as a string.
-func (t TraceID) MarshalText() ([]byte, error) {
-	return []byte(t.String()), nil
+// MarshalJSONPB renders trace id as a single hex string.
+func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, t.AsString())), nil
 }
 
-// UnmarshalText allows TraceID to deserialize itself from a JSON string.
-func (t *TraceID) UnmarshalText(text []byte) error {
-	q, err := TraceIDFromString(string(text))
+// UnmarshalJSONPB TODO
+func (t *TraceID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	println("TraceID.UnmarshalJSONPB called")
+	if len(b) < 3 {
+		return fmt.Errorf("TraceID JSON string cannot be shorter than 3 chars: %s", string(b))
+	}
+	if b[0] != '"' || b[len(b)-1] != '"' {
+		return fmt.Errorf("TraceID JSON string must be enclosed in quotes: %s", string(b))
+	}
+	q, err := TraceIDFromString(string(b[1 : len(b)-1]))
 	if err != nil {
+		println("unmarshal traceID error", err.Error())
 		return err
 	}
 	*t = q
+	println("unmarshaled traceID=", string(b))
 	return nil
 }
 
+// // MarshalText allows TraceID to serialize itself in JSON as a string.
+// // TODO is this needed?
+// func (t TraceID) MarshalText() ([]byte, error) {
+// 	return []byte(t.String()), nil
+// }
+
+// // UnmarshalText allows TraceID to deserialize itself from a JSON string.
+// // TODO is this needed?
+// func (t *TraceID) UnmarshalText(text []byte) error {
+// 	println("TraceID.UnmarshalText called")
+// 	q, err := TraceIDFromString(string(text))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	*t = q
+// 	return nil
+// }
+
 // ------- SpanID -------
 
-func (s SpanID) String() string {
+// AsString converts SpanID to a hex string.
+func (s SpanID) AsString() string {
 	return fmt.Sprintf("%x", uint64(s))
 }
 
@@ -214,15 +254,40 @@ func SpanIDFromString(s string) (SpanID, error) {
 	return SpanID(id), nil
 }
 
-// MarshalText allows SpanID to serialize itself in JSON as a string.
-func (s SpanID) MarshalText() ([]byte, error) {
-	return []byte(s.String()), nil
+// // MarshalText allows SpanID to serialize itself in JSON as a string.
+// // TODO is this needed?
+// func (s SpanID) MarshalText() ([]byte, error) {
+// 	return []byte(s.AsString()), nil
+// }
+
+// // UnmarshalText allows SpanID to deserialize itself from a JSON string.
+// // TODO is this needed?
+// func (s *SpanID) UnmarshalText(text []byte) error {
+// 	q, err := SpanIDFromString(string(text))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	*s = q
+// 	return nil
+// }
+
+// MarshalJSONPB renders span id as a single hex string.
+func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, s.AsString())), nil
 }
 
-// UnmarshalText allows SpanID to deserialize itself from a JSON string.
-func (s *SpanID) UnmarshalText(text []byte) error {
-	q, err := SpanIDFromString(string(text))
+// UnmarshalJSONPB TODO
+func (s *SpanID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
+	println("SpanID.UnmarshalJSONPB called")
+	if len(b) < 3 {
+		return fmt.Errorf("SpanID JSON string cannot be shorter than 3 chars: %s", string(b))
+	}
+	if b[0] != '"' || b[len(b)-1] != '"' {
+		return fmt.Errorf("SpanID JSON string must be enclosed in quotes: %s", string(b))
+	}
+	q, err := SpanIDFromString(string(b[1 : len(b)-1]))
 	if err != nil {
+		println(err.Error())
 		return err
 	}
 	*s = q

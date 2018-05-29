@@ -1,4 +1,4 @@
-package protomodel
+package model
 
 import (
 	"testing"
@@ -11,6 +11,9 @@ import (
 /*
 TODO:
 	- Test if PB model can be used as domain model
+		- Remove span.ParentSpanID
+		- Replace explicit usage of KV.VNum
+
 	- Try a load balancer
 	- Implement UNS-based resolver/balancer
 	- May still need to go to `bytes` encoding for trace/spanID
@@ -49,14 +52,14 @@ Decisions:
 func TestProto(t *testing.T) {
 	span := &Span{
 		TraceID:   TraceID{High: 321, Low: 123},
-		SpanID:    NewSpanID(456),
+		SpanID:    SpanID(456),
 		StartTime: time.Now(),
 		Duration:  42 * time.Microsecond,
 		References: []SpanRef{
 			SpanRef{
 				TraceID: TraceID{Low: 123},
-				SpanID:  NewSpanID(456),
-				Type:    SpanRefType_CHILD_OF,
+				SpanID:  SpanID(456),
+				RefType: SpanRefType_CHILD_OF,
 			},
 		},
 		Tags: []KeyValue{
@@ -95,13 +98,13 @@ func TestProto(t *testing.T) {
 	require.NoError(t, err)
 	t.Logf("kv1 size=%d, bytes=%v", len(kv1b), kv1b)
 
-	kv2 := KeyValue2{
-		Key:   "baz",
-		Value: &KeyValue2_VStr{"foo bar"},
-	}
-	kv2b, err := kv2.Marshal()
-	require.NoError(t, err)
-	t.Logf("kv2 size=%d, bytes=%v", len(kv2b), kv2b)
+	// kv2 := KeyValue2{
+	// 	Key:   "baz",
+	// 	Value: &KeyValue2_VStr{"foo bar"},
+	// }
+	// kv2b, err := kv2.Marshal()
+	// require.NoError(t, err)
+	// t.Logf("kv2 size=%d, bytes=%v", len(kv2b), kv2b)
 }
 
 // func BenchmarkSample(b *testing.B) {
