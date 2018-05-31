@@ -1,26 +1,28 @@
-[
-  {
-    "traceID":"52969a8955571a3f",
-    "spanID":"647d98",
-    "operationName":"get",
-    "references": [
+{
+  "spans": [
+    {
+      "traceID": "52969a8955571a3f",
+      "spanID": "647d98",
+      "operationName": "get",
+      "references": [
         {
-          "refType": "child-of",
+          "refType": "CHILD_OF",
           "traceID": "52969a8955571a3f",
           "spanID": "68c4e3"
         }
       ],
-    "startTime":"2017-01-26T16:46:31.639875-05:00",
-    "duration":22938000,
-    "tags":[
-      {
-        "key":"peer.service",
-        "vType":"binary",
-        "vBlob":"AAAAAAAAMDk="
+      "startTime": "2017-01-26T16:46:31.639875-05:00",
+      "duration": "22938000ns",
+      "tags": [
+        {
+          "key": "peer.service",
+          "vType": "BINARY",
+          "vBinary": "AAAAAAAAMDk="
+        }
+      ],
+      "process": {
+        "serviceName": "api"
       }
-    ],
-    "process":{
-      "serviceName":"api"
     }
-  }
-]
+  ]
+}

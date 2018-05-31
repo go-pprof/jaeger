@@ -40,7 +40,7 @@ func spanRefsEqual(refs []*j.SpanRef, otherRefs []*j.SpanRef) bool {
 	return true
 }
 
-func TestFromDomainSpan(t *testing.T) {
+func TestFromDomainOneSpan(t *testing.T) {
 	spanFile := "fixtures/model_01.json"
 	modelSpans := loadSpans(t, spanFile)
 
@@ -65,9 +65,9 @@ func TestFromDomain(t *testing.T) {
 
 	jaegerSpans := FromDomain(modelSpans)
 	newModelSpans := ToDomain(jaegerSpans, jaegerBatch.Process)
-	for idx := range newModelSpans {
-		modelSpan := modelSpans[idx]
-		newModelSpan := newModelSpans[idx]
+	for i := range newModelSpans {
+		modelSpan := modelSpans[i]
+		newModelSpan := newModelSpans[i]
 		modelSpan.NormalizeTimestamps()
 		newModelSpan.NormalizeTimestamps()
 	}

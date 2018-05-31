@@ -1,5 +1,5 @@
 {
-  "Spans": [
+  "spans": [
     {
       "traceID": "1",
       "spanID": "2",
@@ -14,8 +14,8 @@
           },
           {
             "key": "ip",
-            "vNum": 12345,
-            "vType": "int64"
+            "vType": "INT64",
+            "vInt64": 12345
           },
           {
             "key": "jaeger.version",
