@@ -5,7 +5,7 @@
       "spanID": "2",
       "operationName": "test-general-conversion",
       "startTime": "2017-01-26T16:46:31.639875139-05:00",
-      "duration": 5000,
+      "duration": "5000ns",
       "process": {
         "serviceName": "service-x"
       },
@@ -35,32 +35,32 @@
       "spanID": "2",
       "operationName": "some-operation",
       "startTime": "2017-01-26T16:46:31.639875139-05:00",
-      "duration": 5000,
+      "duration": "5000ns",
       "tags": [
         {
           "key": "peer.service",
-          "vType": "string",
+          "vType": "STRING",
           "vStr": "service-y"
         },
         {
           "key": "peer.ipv4",
-          "vType": "int64",
-          "vNum": 23456
+          "vType": "INT64",
+          "vInt64": 23456
         },
         {
           "key": "error",
-          "vType": "bool",
-          "vNum": 1
+          "vType": "BOOL",
+          "vBool": true
         },
         {
           "key": "temperature",
-          "vType": "float64",
-          "vNum": 4634802150889750528
+          "vType": "FLOAT64",
+          "vFloat64": 72.5
         },
         {
           "key": "blob",
-          "vType": "binary",
-          "vBlob": "AAAwOQ=="
+          "vType": "BINARY",
+          "vBinary": "AAAwOQ=="
         }
       ],
       "process": {
@@ -71,15 +71,15 @@
       "traceID": "1",
       "spanID": "3",
       "references": [
-          {
-              "refType": "CHILD_OF",
-              "traceID": "1",
-              "spanID": "2"
-          }
+        {
+          "refType": "CHILD_OF",
+          "traceID": "1",
+          "spanID": "2"
+        }
       ],
       "operationName": "some-operation",
       "startTime": "2017-01-26T16:46:31.639875139-05:00",
-      "duration": 5000,
+      "duration": "5000ns",
       "process": {
         "serviceName": "service-y"
       }
@@ -89,24 +89,24 @@
       "spanID": "4",
       "operationName": "reference-test",
       "references": [
-          {
-              "refType": "CHILD_OF",
-              "traceID": "ff",
-              "spanID": "ff"
-          },
-          {
-              "refType": "CHILD_OF",
-              "traceID": "1",
-              "spanID": "2"
-          },
-          {
-              "refType": "FOLLOWS_FROM",
-              "traceID": "1",
-              "spanID": "2"
-          }
+        {
+          "refType": "CHILD_OF",
+          "traceID": "ff",
+          "spanID": "ff"
+        },
+        {
+          "refType": "CHILD_OF",
+          "traceID": "1",
+          "spanID": "2"
+        },
+        {
+          "refType": "FOLLOWS_FROM",
+          "traceID": "1",
+          "spanID": "2"
+        }
       ],
       "startTime": "2017-01-26T16:46:31.639875139-05:00",
-      "duration": 5000,
+      "duration": "5000ns",
       "process": {
         "serviceName": "service-y"
       },
@@ -126,7 +126,7 @@
         }
       ],
       "startTime": "2017-01-26T16:46:31.639875139-05:00",
-      "duration": 4000,
+      "duration": "4000ns",
       "process": {
         "serviceName": "service-y"
       },
@@ -135,7 +135,7 @@
       ]
     }
   ],
-  "processMap": {},
+  "processMap": [],
   "warnings": [
     "some trace warning"
   ]

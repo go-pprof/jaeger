@@ -29,9 +29,9 @@ const (
 	// BoolType indicates the value is a Boolean encoded as int64 number 0 or 1
 	BoolType = ValueType_BOOL
 	// Int64Type indicates the value is an int64 number
-	Int64Type = ValueType_LONG
+	Int64Type = ValueType_INT64
 	// Float64Type indicates the value is a float64 number stored as int64
-	Float64Type = ValueType_DOUBLE
+	Float64Type = ValueType_FLOAT64
 	// BinaryType indicates the value is binary blob stored as a byte array
 	BinaryType = ValueType_BINARY
 
@@ -70,12 +70,12 @@ func Bool(key string, value bool) KeyValue {
 
 // Int64 creates a Int64-typed KeyValue
 func Int64(key string, value int64) KeyValue {
-	return KeyValue{Key: key, VType: Int64Type, VLong: value}
+	return KeyValue{Key: key, VType: Int64Type, VInt64: value}
 }
 
 // Float64 creates a Float64-typed KeyValue
 func Float64(key string, value float64) KeyValue {
-	return KeyValue{Key: key, VType: Float64Type, VDouble: value}
+	return KeyValue{Key: key, VType: Float64Type, VFloat64: value}
 }
 
 // Binary creates a Binary-typed KeyValue
@@ -96,7 +96,7 @@ func (kv *KeyValue) Bool() bool {
 // The caller must check VType before using this method.
 func (kv *KeyValue) Int64() int64 {
 	if kv.VType == Int64Type {
-		return kv.VLong
+		return kv.VInt64
 	}
 	return 0
 }
@@ -105,7 +105,7 @@ func (kv *KeyValue) Int64() int64 {
 // The caller must check VType before using this method.
 func (kv *KeyValue) Float64() float64 {
 	if kv.VType == Float64Type {
-		return kv.VDouble
+		return kv.VFloat64
 	}
 	return 0
 }
@@ -127,9 +127,9 @@ func (kv *KeyValue) Value() interface{} {
 	case BoolType:
 		return kv.VBool
 	case Int64Type:
-		return kv.VLong
+		return kv.VInt64
 	case Float64Type:
-		return kv.VDouble
+		return kv.VFloat64
 	case BinaryType:
 		return kv.VBinary
 	default:
@@ -338,9 +338,9 @@ func (kv KeyValue) Hash(w io.Writer) error {
 	case BoolType:
 		err = binary.Write(w, binary.BigEndian, kv.VBool)
 	case Int64Type:
-		err = binary.Write(w, binary.BigEndian, kv.VLong)
+		err = binary.Write(w, binary.BigEndian, kv.VInt64)
 	case Float64Type:
-		err = binary.Write(w, binary.BigEndian, kv.VDouble)
+		err = binary.Write(w, binary.BigEndian, kv.VFloat64)
 	case BinaryType:
 		_, err = w.Write(kv.VBinary)
 	default:

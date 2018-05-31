@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"testing"
 	"time"
 
@@ -58,7 +57,7 @@ func TestMarshalJSON(t *testing.T) {
 	out := &bytes.Buffer{}
 
 	require.NoError(t, m.Marshal(out, trace1))
-	t.Log(out.String())
+
 	var trace2 model.Trace
 	bb := bytes.NewReader(out.Bytes())
 	require.NoError(t, gogojsonpb.Unmarshal(bb, &trace2))
@@ -69,36 +68,43 @@ func TestMarshalJSON(t *testing.T) {
 
 func TestFromDomain(t *testing.T) {
 	for i := 1; i <= NumberOfFixtures; i++ {
-		domainStr, jsonStr := testReadFixtures(t, i, false)
+		domainStr, jsonStr := loadFixturesUI(t, i)
 
 		var trace model.Trace
 		require.NoError(t, gogojsonpb.Unmarshal(bytes.NewReader(domainStr), &trace))
-		// require.NoError(t, json.Unmarshal(domainStr, &trace))
 		uiTrace := FromDomain(&trace)
 
-		testOutput(t, i, jsonStr, uiTrace, false)
+		testJSONEncoding(t, i, jsonStr, uiTrace, false)
 	}
-	// this is just to confirm the uint64 representation of float64(72.5) used as a "temperature" tag
-	assert.Equal(t, int64(4634802150889750528), int64(math.Float64bits(72.5)))
 }
 
 func TestFromDomainEmbedProcess(t *testing.T) {
 	for i := 1; i <= NumberOfFixtures; i++ {
-		inStr, outStr := testReadFixtures(t, i, true)
+		domainStr, jsonStr := loadFixturesES(t, i)
 
 		var span model.Span
-		require.NoError(t, json.Unmarshal(inStr, &span))
+		require.NoError(t, gogojsonpb.Unmarshal(bytes.NewReader(domainStr), &span))
 		embeddedSpan := FromDomainEmbedProcess(&span)
 
 		var expectedSpan jModel.Span
-		require.NoError(t, json.Unmarshal(outStr, &expectedSpan))
+		require.NoError(t, json.Unmarshal(jsonStr, &expectedSpan))
+
+		testJSONEncoding(t, i, jsonStr, embeddedSpan, true)
 
 		CompareJSONSpans(t, &expectedSpan, embeddedSpan)
 	}
 }
 
+func loadFixturesUI(t *testing.T, i int) ([]byte, []byte) {
+	return loadFixtures(t, i, false)
+}
+
+func loadFixturesES(t *testing.T, i int) ([]byte, []byte) {
+	return loadFixtures(t, i, true)
+}
+
 // Loads and returns domain model and JSON model fixtures with given number i.
-func testReadFixtures(t *testing.T, i int, processEmbedded bool) ([]byte, []byte) {
+func loadFixtures(t *testing.T, i int, processEmbedded bool) ([]byte, []byte) {
 	var in string
 	if processEmbedded {
 		in = fmt.Sprintf("fixtures/domain_es_%02d.json", i)
@@ -118,7 +124,7 @@ func testReadFixtures(t *testing.T, i int, processEmbedded bool) ([]byte, []byte
 	return inStr, outStr
 }
 
-func testOutput(t *testing.T, i int, expectedStr []byte, object interface{}, processEmbedded bool) {
+func testJSONEncoding(t *testing.T, i int, expectedStr []byte, object interface{}, processEmbedded bool) {
 	buf := &bytes.Buffer{}
 	enc := json.NewEncoder(buf)
 	enc.SetIndent("", "  ")
@@ -126,11 +132,10 @@ func testOutput(t *testing.T, i int, expectedStr []byte, object interface{}, pro
 	var outFile string
 	if processEmbedded {
 		outFile = fmt.Sprintf("fixtures/es_%02d", i)
-		require.NoError(t, enc.Encode(object.(*jModel.Span)))
 	} else {
 		outFile = fmt.Sprintf("fixtures/ui_%02d", i)
-		require.NoError(t, enc.Encode(object.(*jModel.Trace)))
 	}
+	require.NoError(t, enc.Encode(object))
 
 	if !assert.Equal(t, string(expectedStr), string(buf.Bytes())) {
 		err := ioutil.WriteFile(outFile+"-actual.json", buf.Bytes(), 0644)

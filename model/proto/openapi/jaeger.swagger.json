@@ -104,17 +104,17 @@
         "vStr": {
           "type": "string"
         },
-        "vDouble": {
-          "type": "number",
-          "format": "double"
-        },
         "vBool": {
           "type": "boolean",
           "format": "boolean"
         },
-        "vLong": {
+        "vInt64": {
           "type": "string",
           "format": "int64"
+        },
+        "vFloat64": {
+          "type": "number",
+          "format": "double"
         },
         "vBinary": {
           "type": "string",
@@ -270,9 +270,9 @@
       "type": "string",
       "enum": [
         "STRING",
-        "DOUBLE",
         "BOOL",
-        "LONG",
+        "INT64",
+        "FLOAT64",
         "BINARY"
       ],
       "default": "STRING"

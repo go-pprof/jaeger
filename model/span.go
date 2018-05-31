@@ -151,16 +151,6 @@ func (f Flags) checkFlags(bit Flags) bool {
 	return f&bit == bit
 }
 
-// MarshalJSON renders span id as a single hex string.
-func (f Flags) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`%d`, f)), nil
-}
-
-func (f *Flags) UnmarshalJSON(b []byte) error {
-	*f = 123 // TODO
-	return nil
-}
-
 // ------- TraceID -------
 
 // AsString renders trace id as a single hex string.
@@ -200,7 +190,6 @@ func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 
 // UnmarshalJSONPB TODO
 func (t *TraceID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
-	println("TraceID.UnmarshalJSONPB called")
 	if len(b) < 3 {
 		return fmt.Errorf("TraceID JSON string cannot be shorter than 3 chars: %s", string(b))
 	}
@@ -209,31 +198,21 @@ func (t *TraceID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 	}
 	q, err := TraceIDFromString(string(b[1 : len(b)-1]))
 	if err != nil {
-		println("unmarshal traceID error", err.Error())
 		return err
 	}
 	*t = q
-	println("unmarshaled traceID=", string(b))
 	return nil
 }
 
-// // MarshalText allows TraceID to serialize itself in JSON as a string.
-// // TODO is this needed?
-// func (t TraceID) MarshalText() ([]byte, error) {
-// 	return []byte(t.String()), nil
-// }
+// MarshalText is called by encoding/json, which we do not want people to use.
+func (t TraceID) MarshalText() ([]byte, error) {
+	return nil, fmt.Errorf("unsupported method TraceID.MarshalText; please use github.com/gogo/protobuf/jsonpb for marshalling")
+}
 
-// // UnmarshalText allows TraceID to deserialize itself from a JSON string.
-// // TODO is this needed?
-// func (t *TraceID) UnmarshalText(text []byte) error {
-// 	println("TraceID.UnmarshalText called")
-// 	q, err := TraceIDFromString(string(text))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	*t = q
-// 	return nil
-// }
+// UnmarshalText is called by encoding/json, which we do not want people to use.
+func (t *TraceID) UnmarshalText(text []byte) error {
+	return fmt.Errorf("unsupported method TraceID.UnmarshalText; please use github.com/gogo/protobuf/jsonpb for marshalling")
+}
 
 // ------- SpanID -------
 
@@ -254,23 +233,6 @@ func SpanIDFromString(s string) (SpanID, error) {
 	return SpanID(id), nil
 }
 
-// // MarshalText allows SpanID to serialize itself in JSON as a string.
-// // TODO is this needed?
-// func (s SpanID) MarshalText() ([]byte, error) {
-// 	return []byte(s.AsString()), nil
-// }
-
-// // UnmarshalText allows SpanID to deserialize itself from a JSON string.
-// // TODO is this needed?
-// func (s *SpanID) UnmarshalText(text []byte) error {
-// 	q, err := SpanIDFromString(string(text))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	*s = q
-// 	return nil
-// }
-
 // MarshalJSONPB renders span id as a single hex string.
 func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.AsString())), nil
@@ -278,7 +240,6 @@ func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 
 // UnmarshalJSONPB TODO
 func (s *SpanID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
-	println("SpanID.UnmarshalJSONPB called")
 	if len(b) < 3 {
 		return fmt.Errorf("SpanID JSON string cannot be shorter than 3 chars: %s", string(b))
 	}
@@ -287,7 +248,6 @@ func (s *SpanID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 	}
 	q, err := SpanIDFromString(string(b[1 : len(b)-1]))
 	if err != nil {
-		println(err.Error())
 		return err
 	}
 	*s = q

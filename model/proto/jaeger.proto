@@ -67,24 +67,24 @@ message TraceID {
 // }
 
 enum ValueType {
-  STRING = 0;
-  DOUBLE = 1;
-  BOOL = 2;
-  LONG = 3;
-  BINARY = 4;
+  STRING  = 0;
+  BOOL    = 1;
+  INT64   = 2;
+  FLOAT64 = 3;
+  BINARY  = 4;
 };
 
 message KeyValue {
   option (gogoproto.equal) = true;
   option (gogoproto.compare) = true;
 
-  string    key     = 1;
-  ValueType vType   = 2;
-  string    vStr    = 3;
-  double    vDouble = 4;
-  bool      vBool   = 5;
-  int64     vLong   = 6;
-  bytes     vBinary = 7;
+  string    key      = 1;
+  ValueType vType    = 2;
+  string    vStr     = 3;
+  bool      vBool    = 4;
+  int64     vInt64   = 5;
+  double    vFloat64 = 6;
+  bytes     vBinary  = 7;
 }
 
 message Log {
