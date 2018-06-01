@@ -15,6 +15,7 @@
 package model_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -176,4 +177,23 @@ func TestKeyValueAsStringAndValue(t *testing.T) {
 		assert.Equal(t, "unknown type -1", kv.AsString())
 		assert.EqualError(t, kv.Value().(error), "unknown type -1")
 	})
+}
+
+func TestKeyValueHash(t *testing.T) {
+	testCases := []struct {
+		kv model.KeyValue
+	}{
+		{kv: model.String("x", "Bender is great!")},
+		{kv: model.Bool("x", true)},
+		{kv: model.Int64("x", 3000)},
+		{kv: model.Float64("x", 3.14159265359)},
+		{kv: model.Binary("x", []byte("Bender"))},
+	}
+	for _, tt := range testCases {
+		testCase := tt // capture loop var
+		t.Run(testCase.kv.String(), func(t *testing.T) {
+			out := new(bytes.Buffer)
+			assert.NoError(t, testCase.kv.Hash(out))
+		})
+	}
 }

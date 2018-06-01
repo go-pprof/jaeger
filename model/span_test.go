@@ -16,6 +16,7 @@ package model_test
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -30,11 +31,11 @@ import (
 var (
 	_ jsonpb.JSONPBUnmarshaler = new(model.TraceID)
 	_ jsonpb.JSONPBMarshaler   = new(model.TraceID)
-	_ jsonpb.JSONPBUnmarshaler = new(model.SpanID)
-	_ jsonpb.JSONPBMarshaler   = new(model.SpanID)
+	// _ jsonpb.JSONPBUnmarshaler = new(model.SpanID)
+	// _ jsonpb.JSONPBMarshaler   = new(model.SpanID)
 )
 
-func TestTraceIDMarshalText(t *testing.T) {
+func TestTraceIDMarshalJSONPB(t *testing.T) {
 	testCases := []struct {
 		hi, lo uint64
 		out    string
@@ -56,7 +57,7 @@ func TestTraceIDMarshalText(t *testing.T) {
 	}
 }
 
-func TestTraceIDUnmarshalText(t *testing.T) {
+func TestTraceIDUnmarshalJSONPB(t *testing.T) {
 	testCases := []struct {
 		in     string
 		hi, lo uint64
@@ -86,55 +87,84 @@ func TestTraceIDUnmarshalText(t *testing.T) {
 			}
 		}
 	}
+	// for code coverage
+	var id model.TraceID
+	err := id.UnmarshalJSONPB(nil, []byte(""))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "TraceID JSON string cannot be shorter than 3 chars")
+	err = id.UnmarshalJSONPB(nil, []byte("123"))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "TraceID JSON string must be enclosed in quotes")
+	_, err = id.MarshalText()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "unsupported method")
+	err = id.UnmarshalText(nil)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "unsupported method")
 }
 
-func TestSpanIDMarshalText(t *testing.T) {
+func TestSpanIDMarshalJSON(t *testing.T) {
 	max := int64(-1)
 	testCases := []struct {
 		id  uint64
 		out string
 	}{
-		{id: 1, out: `"1"`},
-		{id: 15, out: `"f"`},
-		{id: 31, out: `"1f"`},
-		{id: 257, out: `"101"`},
-		{id: uint64(max), out: `"ffffffffffffffff"`},
+		{id: 1, out: "1"},
+		{id: 15, out: "f"},
+		{id: 31, out: "1f"},
+		{id: 257, out: "101"},
+		{id: uint64(max), out: "ffffffffffffffff"},
 	}
 	for _, testCase := range testCases {
-		id := model.SpanID(testCase.id)
-		out, err := id.MarshalJSONPB(nil)
-		if assert.NoError(t, err) {
-			assert.Equal(t, testCase.out, string(out))
-		}
+		expected := fmt.Sprintf(`{"traceID":"0","spanID":"%s"}`, testCase.out)
+		t.Run(expected, func(t *testing.T) {
+			ref := &model.SpanRef{SpanID: model.SpanID(testCase.id)}
+			out := new(bytes.Buffer)
+			err := new(jsonpb.Marshaler).Marshal(out, ref)
+			if assert.NoError(t, err) {
+				assert.Equal(t, expected, out.String())
+			}
+		})
 	}
 }
 
-func TestSpanIDUnmarshalText(t *testing.T) {
+func TestSpanIDUnmarshalJSON(t *testing.T) {
 	testCases := []struct {
 		in  string
-		id  uint64
+		id  model.SpanID
 		err bool
 	}{
-		{id: 1, in: `"1"`},
-		{id: 15, in: `"f"`},
-		{id: 31, in: `"1f"`},
-		{id: 257, in: `"101"`},
-		{err: true, in: `""`},
-		{err: true, in: `"x"`},
-		{err: true, in: `"x123"`},
-		{err: true, in: `"10123456789abcdef"`},
+		{id: 1, in: "1"},
+		{id: 15, in: "f"},
+		{id: 31, in: "1f"},
+		{id: 257, in: "101"},
+		{err: true, in: ""},
+		{err: true, in: "x"},
+		{err: true, in: "x123"},
+		{err: true, in: "10123456789abcdef"},
 	}
 	for _, testCase := range testCases {
-		id := new(model.SpanID)
-		err := id.UnmarshalJSONPB(nil, []byte(testCase.in))
-		if testCase.err {
-			assert.Error(t, err)
-		} else {
-			if assert.NoError(t, err) {
-				assert.Equal(t, testCase.id, uint64(*id))
+		in := fmt.Sprintf(`{"traceID":"0","spanID":"%s"}`, testCase.in)
+		t.Run(in, func(t *testing.T) {
+			var ref model.SpanRef
+			err := jsonpb.Unmarshal(bytes.NewReader([]byte(in)), &ref)
+			if testCase.err {
+				assert.Error(t, err)
+			} else {
+				if assert.NoError(t, err) {
+					assert.Equal(t, testCase.id, ref.SpanID)
+				}
 			}
-		}
+		})
 	}
+	// for code coverage
+	var id model.SpanID
+	err := id.UnmarshalJSONPB(nil, []byte(""))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "SpanID JSON string cannot be shorter than 3 chars")
+	err = id.UnmarshalJSONPB(nil, []byte("123"))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "SpanID JSON string must be enclosed in quotes")
 }
 
 func TestIsRPCClientServer(t *testing.T) {
