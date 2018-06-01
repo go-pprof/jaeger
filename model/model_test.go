@@ -63,24 +63,24 @@ func TestProto(t *testing.T) {
 		StartTime: time.Now(),
 		Duration:  42 * time.Microsecond,
 		References: []SpanRef{
-			SpanRef{
+			{
 				TraceID: TraceID{Low: 123},
 				SpanID:  SpanID(456),
 				RefType: SpanRefType_CHILD_OF,
 			},
 		},
 		Tags: []KeyValue{
-			KeyValue{
+			{
 				Key:   "baz",
 				VType: ValueType_STRING,
 				VStr:  "foo bar",
 			},
 		},
 		Logs: []Log{
-			Log{
+			{
 				Timestamp: time.Now(),
 				Fields: []KeyValue{
-					KeyValue{
+					{
 						Key:   "baz",
 						VType: ValueType_STRING,
 						VStr:  "foo bar",
