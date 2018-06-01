@@ -16,6 +16,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 )
 
 // SpanRefType describes the type of a span reference
@@ -30,8 +31,8 @@ const (
 	// that does not depend on the response from the current (child) span
 	FollowsFrom = SpanRefType_FOLLOWS_FROM
 
-	childOfStr     = "child-of"
-	followsFromStr = "follows-from"
+	// childOfStr     = "child-of"
+	// followsFromStr = "follows-from"
 )
 
 // SpanRef describes a reference from one span to another
@@ -53,11 +54,9 @@ const (
 
 // SpanRefTypeFromString converts a string into SpanRefType enum.
 func SpanRefTypeFromString(s string) (SpanRefType, error) {
-	switch s {
-	case childOfStr:
-		return ChildOf, nil
-	case followsFromStr:
-		return FollowsFrom, nil
+	i, ok := SpanRefType_value[strings.ToUpper(s)]
+	if ok {
+		return SpanRefType(i), nil
 	}
 	return SpanRefType(0), fmt.Errorf("not a valid SpanRefType string %s", s)
 }

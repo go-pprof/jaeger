@@ -21,6 +21,7 @@ import (
 	"io"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -35,11 +36,11 @@ const (
 	// BinaryType indicates the value is binary blob stored as a byte array
 	BinaryType = ValueType_BINARY
 
-	stringTypeStr  = "string"
-	boolTypeStr    = "bool"
-	int64TypeStr   = "int64"
-	float64TypeStr = "float64"
-	binaryTypeStr  = "binary"
+	// stringTypeStr  = "string"
+	// boolTypeStr    = "bool"
+	// int64TypeStr   = "int64"
+	// float64TypeStr = "float64"
+	// binaryTypeStr  = "binary"
 )
 
 // KeyValue describes a tag or a log field that consists of a key and a typed value.
@@ -293,35 +294,27 @@ func (kvs KeyValues) Hash(w io.Writer) error {
 
 // ValueTypeFromString converts a string into ValueType enum.
 func ValueTypeFromString(s string) (ValueType, error) {
-	switch s {
-	case stringTypeStr:
-		return StringType, nil
-	case boolTypeStr:
-		return BoolType, nil
-	case int64TypeStr:
-		return Int64Type, nil
-	case float64TypeStr:
-		return Float64Type, nil
-	case binaryTypeStr:
-		return BinaryType, nil
+	i, ok := ValueType_value[strings.ToUpper(s)]
+	if ok {
+		return ValueType(i), nil
 	}
 	return ValueType(0), fmt.Errorf("not a valid ValueType string %s", s)
 }
 
-// MarshalText allows ValueType to serialize itself in JSON as a string.
-func (p ValueType) MarshalText() ([]byte, error) {
-	return []byte(p.String()), nil
-}
+// // MarshalText allows ValueType to serialize itself in JSON as a string.
+// func (p ValueType) MarshalText() ([]byte, error) {
+// 	return []byte(p.String()), nil
+// }
 
-// UnmarshalText allows ValueType to deserialize itself from a JSON string.
-func (p *ValueType) UnmarshalText(text []byte) error {
-	q, err := ValueTypeFromString(string(text))
-	if err != nil {
-		return err
-	}
-	*p = q
-	return nil
-}
+// // UnmarshalText allows ValueType to deserialize itself from a JSON string.
+// func (p *ValueType) UnmarshalText(text []byte) error {
+// 	q, err := ValueTypeFromString(string(text))
+// 	if err != nil {
+// 		return err
+// 	}
+// 	*p = q
+// 	return nil
+// }
 
 // Hash implements Hash from Hashable.
 func (kv KeyValue) Hash(w io.Writer) error {

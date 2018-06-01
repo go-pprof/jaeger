@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/opentracing/opentracing-go/ext"
@@ -185,7 +186,13 @@ func TraceIDFromString(s string) (TraceID, error) {
 
 // MarshalJSONPB renders trace id as a single hex string.
 func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, t.AsString())), nil
+	var b strings.Builder
+	s := t.AsString()
+	b.Grow(2 + len(s))
+	b.WriteByte('"')
+	b.WriteString(s)
+	b.WriteByte('"')
+	return []byte(b.String()), nil
 }
 
 // UnmarshalJSONPB TODO
@@ -218,6 +225,7 @@ func (t *TraceID) UnmarshalText(text []byte) error {
 
 // AsString converts SpanID to a hex string.
 func (s SpanID) AsString() string {
+	println(s)
 	return fmt.Sprintf("%x", uint64(s))
 }
 
@@ -234,8 +242,14 @@ func SpanIDFromString(s string) (SpanID, error) {
 }
 
 // MarshalJSONPB renders span id as a single hex string.
+// TODO this method is never called by "github.com/gogo/protobuf/jsonpb" Marshaler.
 func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.AsString())), nil
+}
+
+// MarshalText allows SpanID to serialize itself in JSON as a string.
+func (s SpanID) MarshalText() ([]byte, error) {
+	return []byte(s.AsString()), nil
 }
 
 // UnmarshalJSONPB TODO
