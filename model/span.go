@@ -225,7 +225,6 @@ func (t *TraceID) UnmarshalText(text []byte) error {
 
 // AsString converts SpanID to a hex string.
 func (s SpanID) AsString() string {
-	println(s)
 	return fmt.Sprintf("%x", uint64(s))
 }
 

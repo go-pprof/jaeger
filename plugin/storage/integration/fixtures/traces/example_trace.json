@@ -1,12 +1,12 @@
 {
-  "Spans": [
+  "spans": [
     {
       "traceID": "11",
       "spanID": "3",
       "operationName": "example-operation-1",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",
-      "duration": 100000,
+      "duration": "100000ns",
       "tags": [],
       "process": {
         "serviceName": "example-service-1",
@@ -29,7 +29,7 @@
       "operationName": "example-operation-2",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",
-      "duration": 100000,
+      "duration": "100000ns",
       "tags": [],
       "process": {
         "serviceName": "example-service-2",
@@ -52,7 +52,7 @@
       "operationName": "example-operation-1",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",
-      "duration": 100000,
+      "duration": "100000ns",
       "tags": [],
       "process": {
         "serviceName": "example-service-3",
@@ -75,7 +75,7 @@
       "operationName": "example-operation-3",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",
-      "duration": 100000,
+      "duration": "100000ns",
       "tags": [],
       "process": {
         "serviceName": "example-service-1",
@@ -98,7 +98,7 @@
       "operationName": "example-operation-4",
       "references": [],
       "startTime": "2017-01-26T16:46:31.639875Z",
-      "duration": 100000,
+      "duration": "100000ns",
       "tags": [],
       "process": {
         "serviceName": "example-service-1",
