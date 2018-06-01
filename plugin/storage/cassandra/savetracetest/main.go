@@ -47,7 +47,7 @@ func main() {
 	if err = spanStore.WriteSpan(getSomeSpan()); err != nil {
 		logger.Fatal("Failed to save", zap.Error(err))
 	} else {
-		logger.Info("Saved span", zap.String("spanID", getSomeSpan().SpanID.AsString()))
+		logger.Info("Saved span", zap.String("spanID", getSomeSpan().SpanID.String()))
 	}
 	s := getSomeSpan()
 	trace, err := spanReader.GetTrace(s.TraceID)

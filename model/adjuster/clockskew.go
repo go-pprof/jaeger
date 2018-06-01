@@ -122,7 +122,7 @@ func (a *clockSkewAdjuster) buildSubGraphs() {
 		if p, ok := a.spans[n.span.ParentSpanID()]; ok {
 			p.children = append(p.children, n)
 		} else {
-			warning := fmt.Sprintf(warningFormatInvalidParentID, n.span.ParentSpanID().AsString())
+			warning := fmt.Sprintf(warningFormatInvalidParentID, n.span.ParentSpanID().String())
 			n.span.Warnings = append(n.span.Warnings, warning)
 			// Treat spans with invalid parent ID as root spans
 			a.roots[n.span.SpanID] = n

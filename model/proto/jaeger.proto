@@ -47,8 +47,12 @@ option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
 // Enable registration with golang/protobuf for the grpc-gateway.
 option (gogoproto.goproto_registration) = true;
+// Disable String()
+// option (gogoproto.goproto_stringer_all) = false;
 
 message TraceID {
+  option (gogoproto.goproto_stringer) =  false;
+
   uint64 low = 1;
   uint64 high = 2;
 }

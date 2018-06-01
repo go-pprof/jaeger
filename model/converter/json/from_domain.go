@@ -48,7 +48,7 @@ func (fd fromDomain) fromDomain(trace *model.Trace) *json.Trace {
 	var traceID json.TraceID
 	for i, span := range trace.Spans {
 		if i == 0 {
-			traceID = json.TraceID(span.TraceID.AsString())
+			traceID = json.TraceID(span.TraceID.String())
 		}
 		processID := json.ProcessID(processes.getKey(span.Process))
 		jSpans[i] = fd.convertSpan(span, processID)
@@ -64,8 +64,8 @@ func (fd fromDomain) fromDomain(trace *model.Trace) *json.Trace {
 
 func (fd fromDomain) convertSpanInternal(span *model.Span) json.Span {
 	return json.Span{
-		TraceID:       json.TraceID(span.TraceID.AsString()),
-		SpanID:        json.SpanID(span.SpanID.AsString()),
+		TraceID:       json.TraceID(span.TraceID.String()),
+		SpanID:        json.SpanID(span.SpanID.String()),
 		Flags:         uint32(span.Flags),
 		OperationName: span.OperationName,
 		StartTime:     model.TimeAsEpochMicroseconds(span.StartTime),
@@ -96,8 +96,8 @@ func (fd fromDomain) convertReferences(span *model.Span) []json.Reference {
 	for _, ref := range span.References {
 		out = append(out, json.Reference{
 			RefType: fd.convertRefType(ref.RefType),
-			TraceID: json.TraceID(ref.TraceID.AsString()),
-			SpanID:  json.SpanID(ref.SpanID.AsString()),
+			TraceID: json.TraceID(ref.TraceID.String()),
+			SpanID:  json.SpanID(ref.SpanID.String()),
 		})
 	}
 	return out

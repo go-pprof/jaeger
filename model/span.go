@@ -154,8 +154,8 @@ func (f Flags) checkFlags(bit Flags) bool {
 
 // ------- TraceID -------
 
-// AsString renders trace id as a single hex string.
-func (t TraceID) AsString() string {
+// String renders trace id as a single hex string.
+func (t TraceID) String() string {
 	if t.High == 0 {
 		return fmt.Sprintf("%x", t.Low)
 	}
@@ -187,7 +187,7 @@ func TraceIDFromString(s string) (TraceID, error) {
 // MarshalJSONPB renders trace id as a single hex string.
 func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	var b strings.Builder
-	s := t.AsString()
+	s := t.String()
 	b.Grow(2 + len(s))
 	b.WriteByte('"')
 	b.WriteString(s)
@@ -223,8 +223,8 @@ func (t *TraceID) UnmarshalText(text []byte) error {
 
 // ------- SpanID -------
 
-// AsString converts SpanID to a hex string.
-func (s SpanID) AsString() string {
+// String converts SpanID to a hex string.
+func (s SpanID) String() string {
 	return fmt.Sprintf("%x", uint64(s))
 }
 
@@ -243,12 +243,12 @@ func SpanIDFromString(s string) (SpanID, error) {
 // MarshalJSONPB renders span id as a single hex string.
 // TODO this method is never called by "github.com/gogo/protobuf/jsonpb" Marshaler.
 func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, s.AsString())), nil
+	return []byte(fmt.Sprintf(`"%s"`, s.String())), nil
 }
 
 // MarshalText allows SpanID to serialize itself in JSON as a string.
 func (s SpanID) MarshalText() ([]byte, error) {
-	return []byte(s.AsString()), nil
+	return []byte(s.String()), nil
 }
 
 // UnmarshalJSONPB TODO

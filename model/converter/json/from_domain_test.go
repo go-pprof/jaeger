@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	gogojsonpb "github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -53,14 +53,14 @@ func TestMarshalJSON(t *testing.T) {
 			},
 		},
 	}
-	m := &gogojsonpb.Marshaler{}
+	m := &jsonpb.Marshaler{}
 	out := &bytes.Buffer{}
 
 	require.NoError(t, m.Marshal(out, trace1))
 
 	var trace2 model.Trace
 	bb := bytes.NewReader(out.Bytes())
-	require.NoError(t, gogojsonpb.Unmarshal(bb, &trace2))
+	require.NoError(t, jsonpb.Unmarshal(bb, &trace2))
 	trace1.NormalizeTimestamps()
 	trace2.NormalizeTimestamps()
 	assert.Equal(t, trace1, &trace2)
@@ -71,7 +71,7 @@ func TestFromDomain(t *testing.T) {
 		domainStr, jsonStr := loadFixturesUI(t, i)
 
 		var trace model.Trace
-		require.NoError(t, gogojsonpb.Unmarshal(bytes.NewReader(domainStr), &trace))
+		require.NoError(t, jsonpb.Unmarshal(bytes.NewReader(domainStr), &trace))
 		uiTrace := FromDomain(&trace)
 
 		testJSONEncoding(t, i, jsonStr, uiTrace, false)
@@ -83,7 +83,7 @@ func TestFromDomainEmbedProcess(t *testing.T) {
 		domainStr, jsonStr := loadFixturesES(t, i)
 
 		var span model.Span
-		require.NoError(t, gogojsonpb.Unmarshal(bytes.NewReader(domainStr), &span))
+		require.NoError(t, jsonpb.Unmarshal(bytes.NewReader(domainStr), &span))
 		embeddedSpan := FromDomainEmbedProcess(&span)
 
 		var expectedSpan jModel.Span
