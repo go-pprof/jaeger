@@ -241,7 +241,7 @@ func SpanIDFromString(s string) (SpanID, error) {
 }
 
 // MarshalJSONPB renders span id as a single hex string.
-// TODO this method is never called by "github.com/gogo/protobuf/jsonpb" Marshaler.
+// TODO: this method is never called by "github.com/gogo/protobuf/jsonpb" Marshaler.
 // See https://github.com/gogo/protobuf/issues/411.
 func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.String())), nil

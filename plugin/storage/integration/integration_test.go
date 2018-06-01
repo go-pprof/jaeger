@@ -23,7 +23,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
 	"time"
 
 	"github.com/gogo/protobuf/jsonpb"
@@ -289,7 +288,7 @@ func getTraceFixture(t *testing.T, fixture string) *model.Trace {
 
 func getTraceFixtureExact(t *testing.T, fileName string) *model.Trace {
 	var trace model.Trace
-	loadAndParseFixture(t, fileName, &trace)
+	loadAndParseJSONPB(t, fileName, &trace)
 	return &trace
 }
 
@@ -302,7 +301,7 @@ func getTraceFixtures(t *testing.T, fixtures []string) []*model.Trace {
 	return traces
 }
 
-func loadAndParseFixture(t *testing.T, path string, object proto.Message) {
+func loadAndParseJSONPB(t *testing.T, path string, object proto.Message) {
 	inStr, err := ioutil.ReadFile(path)
 	require.NoError(t, err, "Not expecting error when loading fixture %s", path)
 	err = jsonpb.Unmarshal(bytes.NewReader(correctTime(inStr)), object)

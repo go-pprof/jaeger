@@ -47,10 +47,9 @@ option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
 // Enable registration with golang/protobuf for the grpc-gateway.
 option (gogoproto.goproto_registration) = true;
-// Disable String()
-// option (gogoproto.goproto_stringer_all) = false;
 
 message TraceID {
+  // We have a custom String() method that renders trace ID as a single hex string, so turn off auto-gen.
   option (gogoproto.goproto_stringer) =  false;
 
   uint64 low = 1;
@@ -112,7 +111,7 @@ message SpanRef {
   ];
   uint64 spanID = 2 [
     (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "SpanID"
+    (gogoproto.customtype) = "SpanID" // alias to uint64
   ];
   SpanRefType refType = 3;
 }
@@ -138,7 +137,7 @@ message Span {
   ];
   uint32 flags = 5 [
     (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "Flags"
+    (gogoproto.customtype) = "Flags" // alias to uint32
   ];
   google.protobuf.Timestamp startTime = 6 [
     (gogoproto.stdtime) = true,
@@ -189,7 +188,8 @@ message Batch {
       (gogoproto.nullable) = false
     ];
 }
-  
+
+// TODO: move services to another proto file.
 service CollectorServiceV1 {
     rpc PostSpans(Batch) returns (google.protobuf.Empty) {
         option (google.api.http) = {
