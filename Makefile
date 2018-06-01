@@ -92,8 +92,9 @@ cover: nocover
 	@echo pre-compiling tests
 	@time go test -i $(ALL_PKGS)
 	@./scripts/cover.sh $(shell go list $(TOP_PKGS))
-	egrep -v 'jaeger.pb.*.go' cover.out > cover-nogen.out
-	go tool cover -html=cover-nogen.out -o cover.html
+	grep -E -v 'jaeger.pb.*.go' cover.out > cover-nogen.out
+	mv cover-nogen.out cover.out
+	go tool cover -html=cover.out -o cover.html
 
 .PHONY: nocover
 nocover:
