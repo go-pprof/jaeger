@@ -195,7 +195,7 @@ func (t TraceID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return []byte(b.String()), nil
 }
 
-// UnmarshalJSONPB TODO
+// UnmarshalJSONPB populates TraceID from a quoted hex string. Called by gogo/protobuf/jsonpb.
 func (t *TraceID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 	if len(b) < 3 {
 		return fmt.Errorf("TraceID JSON string cannot be shorter than 3 chars: %s", string(b))
@@ -242,6 +242,7 @@ func SpanIDFromString(s string) (SpanID, error) {
 
 // MarshalJSONPB renders span id as a single hex string.
 // TODO this method is never called by "github.com/gogo/protobuf/jsonpb" Marshaler.
+// See https://github.com/gogo/protobuf/issues/411.
 func (s SpanID) MarshalJSONPB(*jsonpb.Marshaler) ([]byte, error) {
 	return []byte(fmt.Sprintf(`"%s"`, s.String())), nil
 }
@@ -251,7 +252,7 @@ func (s SpanID) MarshalText() ([]byte, error) {
 	return []byte(s.String()), nil
 }
 
-// UnmarshalJSONPB TODO
+// UnmarshalJSONPB populates SpanID from a quoted hex string. Called by gogo/protobuf/jsonpb.
 func (s *SpanID) UnmarshalJSONPB(_ *jsonpb.Unmarshaler, b []byte) error {
 	if len(b) < 3 {
 		return fmt.Errorf("SpanID JSON string cannot be shorter than 3 chars: %s", string(b))
